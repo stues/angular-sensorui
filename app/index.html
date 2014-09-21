@@ -28,6 +28,7 @@
         <ul class="nav nav-pills pull-right">
             <li class="active"><a ng-href="#">Home</a></li>
             <li><a ng-href="#/map">Map</a></li>
+            <li><a ng-href="#/object-table">Features</a></li>
             <li><a ng-href="#/about">About</a></li>
             <li><a ng-href="#">Contact</a></li>
         </ul>
@@ -79,16 +80,17 @@
 <script src="bower_components/angular-touch/angular-touch.js"></script>
 <script src="bower_components/angular-route/angular-route.js"></script>
 <script src="bower_components/angular-openlayers-directive/dist/angular-openlayers-directive.js"></script>
+<script src="bower_components/openlayers3/build/ol.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
-<script type="text/javascript" src="bower_components/openlayers3/build/ol.js"></script>
-
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
 <script src="scripts/app.js"></script>
+<script src="scripts/service.js"></script>
 <script src="scripts/controllers/main.js"></script>
 <script src="scripts/controllers/about.js"></script>
 <script src="scripts/controllers/map.js"></script>
+<script src="scripts/controllers/object-table.js"></script>
 <!-- endbuild -->
 
 </body>

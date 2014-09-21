@@ -38,6 +38,10 @@ angular
         templateUrl: 'views/map.html',
         controller: 'MapCtrl'
       })
+      .when('/object-table', {
+        templateUrl: 'views/object-table.html',
+        controller: 'ObjectTableCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
