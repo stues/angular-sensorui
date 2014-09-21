@@ -2,21 +2,28 @@
 
 /**
  * @ngdoc overview
- * @name sensorwebuiApp
+ * @name angularol3jsuiApp
  * @description
- * # sensorwebuiApp
+ * # angularol3jsuiApp
  *
  * Main module of the application.
  */
 angular
-  .module('sensorwebuiApp', [
+  .module('angularol3jsuiApp', [
     'ngAnimate',
     'ngCookies',
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch'
-  ])
+    'ngTouch',
+    'openlayers-directive'
+  ]).controller('MapCtrl', function ($scope) {
+        $scope.awesomeThings = [
+            'HTML5 Boilerplate',
+            'AngularJS',
+            'Karma'
+        ];
+    })
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
@@ -26,6 +33,10 @@ angular
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
+      })
+      .when('/map', {
+        templateUrl: 'views/map.html',
+        controller: 'MapCtrl'
       })
       .otherwise({
         redirectTo: '/'

@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name sensorwebuiApp.controller:AboutCtrl
+ * @name angularol3jsuiApp.controller:AboutCtrl
  * @description
  * # AboutCtrl
- * Controller of the sensorwebuiApp
+ * Controller of the angularol3jsuiApp
  */
-angular.module('sensorwebuiApp')
+angular.module('angularol3jsuiApp')
   .controller('AboutCtrl', function ($scope) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',

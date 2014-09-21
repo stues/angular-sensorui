@@ -1,6 +1,6 @@
 <!doctype html>
 <html class="no-js">
-  <head>
+<head>
     <meta charset="utf-8">
     <title></title>
     <meta name="description" content="">
@@ -9,200 +9,87 @@
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/openlayers3/build/ol.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
-  </head>
-  <body ng-app="ol">
-  <div open-layer-map zoom="4" center="[-10997148, 4569099]">
-      <div map-quest layer="sat"></div>
-      <div map-quest layer="hyb"></div>
-      <div wms-layer title="Layer title" url="http://demo.opengeo.org/geoserver/wms" layer="topp:states" tiled="true" server-type="geoserver"></div>
-      <!--div wmts-layer></div-->
-  </div>
+</head>
+<body ng-app="angularol3jsuiApp">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<div class="container">
+    <div class="header">
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a ng-href="#">Home</a></li>
+            <li><a ng-href="#/map">Map</a></li>
+            <li><a ng-href="#/about">About</a></li>
+            <li><a ng-href="#">Contact</a></li>
+        </ul>
+        <h3 class="text-muted">angularol3jsui</h3>
+    </div>
+
+    <div ng-view=""></div>
+
+    <div class="footer">
+        <p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
+    </div>
+</div>
 
 
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-     <script>
-       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-       ga('create', 'UA-XXXXX-X');
-       ga('send', 'pageview');
-    </script>
+    ga('create', 'UA-XXXXX-X');
+    ga('send', 'pageview');
+</script>
 
-    <!-- build:js(.) scripts/oldieshim.js -->
-    <!--[if lt IE 9]>
-    <script src="bower_components/es5-shim/es5-shim.js"></script>
-    <script src="bower_components/json3/lib/json3.js"></script>
-    <![endif]-->
-    <!-- endbuild -->
+<!-- build:js(.) scripts/oldieshim.js -->
+<!--[if lt IE 9]>
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/json3/lib/json3.js"></script>
+<![endif]-->
+<!-- endbuild -->
 
-    <!-- build:js(.) scripts/vendor.js -->
-    <!-- bower:js -->
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/angular-resource/angular-resource.js"></script>
-    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/angular-animate/angular-animate.js"></script>
-    <script src="bower_components/angular-touch/angular-touch.js"></script>
-    <script src="bower_components/angular-route/angular-route.js"></script>
-    <!-- endbower -->
-    <!-- endbuild -->
+<!-- build:js(.) scripts/vendor.js -->
+<!-- bower:js -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/angular-touch/angular-touch.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/angular-openlayers-directive/dist/angular-openlayers-directive.js"></script>
+<!-- endbower -->
+<!-- endbuild -->
 
-    <!-- custom -->
-    <script type="text/javascript" src="http://ol3js.org/en/master/build/ol.js"></script>
-    <script type="text/javascript">
-        var app = angular.module('ol', [
-            'ol.directives',
-            'ol.services'
-        ]);
-        var directives = angular.module('ol.directives', [])
-        var services = angular.module('ol.services', []);
-        services.factory('layerService', function() {
-            var layerService = {
-                layers: [],
-                getLayers: function(){
-                    console.log(this);
-                    return [];
-                }
-            };
-            return layerService;
-        });
-        directives.directive('openLayerMap', ['layerService', '$parse', function(layerService, $parse) {
-            return {
-                restrict: 'A',
-                scope: {
-                },
-                /*link: function(scope, element, attrs) {
-                 },*/
-                controller: function($scope, $element, $attrs) {
-                    this.addLayer = function(layer) {
-                        console.log(layer);
-                        $scope.map.addLayer(layer);
-                    };
-                    (function(scope, element, attrs){
-                        var projectionParams = {};
-                        if (attrs.projection) {
-                            projectionParams['code'] = attrs.projection;
-                        }
-                        if (attrs.units) {
-                            projectionParams['units'] = attrs.units;
-                        }
-                        var projection = undefined;
-                        if (Object.keys(projectionParams).length > 0) {
-                            projection = new ol.proj.Projection(projectionParams);
-                        }
-                        $scope.map = new ol.Map({
-                            target: element[0],
-//renderer: 'canvas',
-                            layers: [],
-                            view: new ol.View({
-                                projection: projection,
-                                center: $parse(attrs.center)(scope),
-                                zoom: $parse(attrs.zoom)(scope)
-                            })
-                        });
-                    })($scope, $element, $attrs);
-                }
-            }
-        }]);
-        directives.directive('wmsLayer', ['$parse', function($parse) {
-            return {
-                restrict: 'A',
-                transclude: true,
-                scope: {},
-                require: '^openLayerMap',
-                link: function(scope, element, attrs, openLayerMapCtrl) {
-                    var params = {};
-                    if (attrs.version) {
-                        params['VERSION'] = attrs.version;
-                    }
-                    if (attrs.layer) {
-                        params['LAYERS'] = attrs.layer;
-                    }
-                    if (attrs.tiled) {
-                        params['TILED'] = $parse(attrs.tiled)(scope);
-                    }
-                    var wmsLayer = new ol.layer.Tile({
-                        title: attrs.title,
-                        source: new ol.source.TileWMS({
-                            url: attrs.url,
-//crossOrigin: 'anonymous',
-                            params: params
-                        })
-                    });
-                    openLayerMapCtrl.addLayer(wmsLayer);
-                }
-            };
-        }]);
-        directives.directive('mapQuest', [function() {
-            return {
-                restrict: 'A',
-                transclude: true,
-                scope: {},
-                require: '^openLayerMap',
-                link: function(scope, element, attrs, openLayerMapCtrl) {
-                    var mapQuestLayer = new ol.layer.Tile({
-                        source: new ol.source.MapQuest({layer: attrs.layer})
-                    });
-                    openLayerMapCtrl.addLayer(mapQuestLayer);
-                }
-            };
-        }]);
-        directives.directive('wmtsLayer', [function() {
-            return {
-                restrict: 'A',
-                require: '^openLayerMap',
-                link: function(scope, element, attrs, openLayerMapCtrl) {
-                    var projection = ol.proj.get('EPSG:3857');
-                    var projectionExtent = projection.getExtent();
-                    var size = ol.extent.getWidth(projectionExtent) / 256;
-                    var resolutions = new Array(14);
-                    var matrixIds = new Array(14);
-                    for (var z = 0; z < 14; ++z) {
-// generate resolutions and matrixIds arrays for this WMTS
-                        resolutions[z] = size / Math.pow(2, z);
-                        matrixIds[z] = z;
-                    }
-                    var attribution = new ol.Attribution({
-                        html: 'Tiles &copy; <a href="http://services.arcgisonline.com/arcgis/rest/' +
-                                'services/Demographics/USA_Population_Density/MapServer/">ArcGIS</a>'
-                    });
-                    var wmtsLayer = new ol.layer.Tile({
-                        opacity: 0.7,
-                        source: new ol.source.WMTS({
-                            attributions: [attribution],
-                            url: 'http://kortforsyningen.kms.dk/topo_skaermkort?',
-                            layer: '0',
-                            matrixSet: 'EPSG:3857',
-                            format: 'image/png',
-                            projection: projection,
-                            tileGrid: new ol.tilegrid.WMTS({
-                                origin: ol.extent.getTopLeft(projectionExtent),
-                                resolutions: resolutions,
-                                matrixIds: matrixIds
-                            }),
-                            extent: projectionExtent,
-                            style: 'default',
-                            options: new ol.source.WMTSOptions({ ticket: '38d27309cd0c27ada666f3bb5b4d8b08' })
-                        })
-                    });
-                    openLayerMapCtrl.addLayer(wmtsLayer);
-                }
-            };
-        }]);
-    </script>
-        <!-- build:js({.tmp,app}) scripts/scripts.js -->
-        <script src="scripts/app.js"></script>
-        <script src="scripts/controllers/main.js"></script>
-        <script src="scripts/controllers/about.js"></script>
-        <!-- endbuild -->
+<script type="text/javascript" src="bower_components/openlayers3/build/ol.js"></script>
+
+<!-- build:js({.tmp,app}) scripts/scripts.js -->
+<script src="scripts/app.js"></script>
+<script src="scripts/controllers/main.js"></script>
+<script src="scripts/controllers/about.js"></script>
+<script src="scripts/controllers/map.js"></script>
+<!-- endbuild -->
+
 </body>
 </html>
