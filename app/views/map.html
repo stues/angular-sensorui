@@ -1,3 +1,13 @@
-<p>Name: <input type="text" ng-model="name"></p>
-<span ng-bind="name" />
-<openlayers height="480px" width="640px"></openlayers>
+<div>
+
+    <h2>
+        Live Data
+        <button ng-click="connect()" class="btn btn-primary btn-lg"
+                ng-disabled="connectDisabled">
+            <span class="glyphicon glyphicon-flash"></span>
+            {{connectCommandLabel}}
+        </button>
+    </h2>
+
+    <openlayers center="switzerland" layers="layers" height="400"></openlayers>
+</div>

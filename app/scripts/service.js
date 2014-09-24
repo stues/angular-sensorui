@@ -7,23 +7,23 @@ angular.module('angularol3jsuiApp')
         var service = {};
 
         service.msgs = 0;
-        service.connectionStatus = "";
+        service.connectionStatus = '';
 
         service.connect = function () {
             if (service.ws) {
                 return;
             }
 
-            var ws = new WebSocket("ws://127.0.0.1:8443/traffic");
+            var ws = new WebSocket('ws://127.0.0.1:8443/traffic');
 
             ws.onopen = function () {
-                service.connectionStatus = "Connected";
+                service.connectionStatus = 'Connected';
                 service.callbackStatus(service.connectionStatus);
                 service.callbackWebsocketEnablement(true);
             };
 
             ws.onerror = function () {
-                service.connectionStatus = "Unable to open Connection";
+                service.connectionStatus = 'Unable to open Connection';
                 service.callbackStatus(service.connectionStatus);
                 service.callbackWebsocketEnablement(false);
                 service.closeConnection();
@@ -48,7 +48,7 @@ angular.module('angularol3jsuiApp')
 
         service.disconnect = function () {
             service.closeConnection();
-            service.connectionStatus = "Disconnected";
+            service.connectionStatus = 'Disconnected';
             service.callbackStatus(service.connectionStatus);
         };
 
@@ -66,24 +66,24 @@ angular.module('angularol3jsuiApp')
 
         service.getNextOperationLabel = function () {
             if (service.ws) {
-                return "Disconnect";
+                return 'Disconnect';
             } else {
-                return "Connect";
+                return 'Connect';
             }
-        }
+        };
 
         service.getMessageCount = function () {
             if (service.ws) {
                 return service.msgs;
             }
-        }
+        };
 
         service.isConnected = function () {
             if (service.ws) {
                 return true;
             }
             return false;
-        }
+        };
 
         return service;
     });
