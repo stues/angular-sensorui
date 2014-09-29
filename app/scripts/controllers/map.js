@@ -12,31 +12,51 @@ angular.module('angularol3jsuiApp')
 
         var stop;
 
-        var geoJSONformat = new ol.format.GeoJSON();
+        var geoJSONFormat = new ol.format.GeoJSON({defaultDataProjection:'EPSG:4326'});
 
-        var vectorSource = new ol.source.Vector();
+        var vectorSource = new ol.source.Vector({projection:'EPSG:3857'});
 
         var vectorLayer = new ol.layer.Vector({
             title: "Tracks",
             source: vectorSource,
             style: (function () {
+
                 var textFill = new ol.style.Fill({
-                    color: '#000'
+                    color: '#800'
                 });
 
+                var doublePi = 2 * Math.PI;
+
+                var rotationPropertyName = 'track';
+                var labelPropertyName = 'callsign';
+
+                var imgSrc = 'images/aircraft.svg';
+                var imgSize = 32;
+                var halfImgSize = imgSize/2;
+                var font = '8px Calibri,sans-serif';
+                var textAlignment = 'left';
+
+
+                function degreeToRad(feature, propertyName){
+                    return (feature.get(propertyName)/360.0) * doublePi;
+                }
+
+
                 return function (feature) {
-
                     var icon = new ol.style.Icon(({
-                        src: 'images/airplane.png',
-                        rotation: 180-feature.get('track')
+                        src: imgSrc,
+                        width: imgSize,
+                        rotation: degreeToRad(feature, rotationPropertyName)
                     }));
-
 
                     return [new ol.style.Style({
                         text: new ol.style.Text({
-                            font: '8px Calibri,sans-serif',
-                            text: feature.get('callsign'),
-                            fill: textFill
+                            font: font,
+                            textAlign: textAlignment,
+                            text: feature.get(labelPropertyName),
+                            fill: textFill,
+                            offsetY: halfImgSize,
+                            offsetX: halfImgSize
                         }),
                         image: icon
                     })];
@@ -95,7 +115,7 @@ angular.module('angularol3jsuiApp')
 
 
                 olData.getMap().then(function (map) {
-                    olData.getLayers().then(function (layers) {
+                    olData.getLayers().then(function () {
                         map.addLayer(vectorLayer);
                     });
                 });
@@ -142,17 +162,15 @@ angular.module('angularol3jsuiApp')
          * Removes all features which are older than a given
          */
         function removeOldFeatures() {
-            var currentmillis = $scope.currentUTCDate();
-            var currentseconds = currentmillis - $scope.maxLastSeen;
+            var currentMillis = $scope.currentUTCDate();
+            var currentSeconds = currentMillis - $scope.maxLastSeen;
             var features = vectorSource.getFeatures();
-            for (var feature in features) {
-                console.log(feature);
+            var featuresLength = features.length;
+            for (var i = 0; i < featuresLength; i++) {
+                var feature = features[i];
                 var featureSeenDate = feature.get('messageGenerated');
-                if (currentseconds > featureSeenDate) {
-                    var featureToRemove = vectorSource.getFeatureById(id);
-                    if (featureToRemove) {
-                        vectorSource.removeFeature(featureToRemove);
-                    }
+                if (currentSeconds > featureSeenDate) {
+                    vectorSource.removeFeature(feature);
                 }
             }
         }
@@ -171,18 +189,16 @@ angular.module('angularol3jsuiApp')
 
                 if (jsonObject.geometry !== null) {
                     jsonObject.id = id;
-                    var geoJsonFeature = geoJSONformat.readFeature(jsonObject);
+                    var geoJsonFeature = geoJSONFormat.readFeature(jsonObject, {featureProjection:'EPSG:3857'});
 
                     var currentFeature = vectorSource.getFeatureById(id);
                     if (!currentFeature) {
                         currentFeature = geoJsonFeature;
                         vectorSource.addFeature(currentFeature);
                     }
-                    currentFeature.setGeometry(new ol.geom.Point(ol.proj.transform(geoJsonFeature.getGeometry().flatCoordinates, 'EPSG:4326',
-                        'EPSG:3857')));
+                    currentFeature.setGeometry(geoJsonFeature.getGeometry());
                 }
 
             }
-        };
-}])
-;
+        }
+}]);
