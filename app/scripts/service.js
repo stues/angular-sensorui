@@ -7,7 +7,10 @@ angular.module('angularol3jsuiApp')
         var service = {};
 
         service.msgs = 0;
+
         service.connectionStatus = '';
+
+        service.status = false;
 
         service.connect = function () {
             if (service.ws) {
@@ -18,20 +21,36 @@ angular.module('angularol3jsuiApp')
 
             ws.onopen = function () {
                 service.connectionStatus = 'Connected';
-                service.callbackStatus(service.connectionStatus);
-                service.callbackWebsocketEnablement(true);
+                if(service.callbackStatus){
+                    service.callbackStatus(service.connectionStatus);
+                }
+                service.status = true;
+                if(service.callbackWebsocketEnablement){
+                    service.callbackWebsocketEnablement(service.status);
+                }
             };
 
             ws.onerror = function () {
                 service.connectionStatus = 'Unable to open Connection';
-                service.callbackStatus(service.connectionStatus);
-                service.callbackWebsocketEnablement(false);
+                if(service.callbackStatus) {
+                    service.callbackStatus(service.connectionStatus);
+                }
+                service.status = false;
+                if(service.callbackWebsocketEnablement) {
+                    service.callbackWebsocketEnablement(service.status);
+                }
                 service.closeConnection();
             };
 
             ws.onmessage = function (message) {
                 service.msgs++;
-                service.callbackMessageReceived(message);
+                if(service.callbackMessageReceived) {
+                    service.callbackMessageReceived(message);
+                }
+
+                if(service.callbackMessageAmount) {
+                    service.callbackMessageAmount(service.msgs);
+                }
             };
 
             service.ws = ws;
@@ -43,13 +62,18 @@ angular.module('angularol3jsuiApp')
                 service.msgs = 0;
                 delete service.ws;
             }
-            service.callbackWebsocketEnablement(false);
         };
 
         service.disconnect = function () {
             service.closeConnection();
+            service.status = false;
+            if(service.callbackWebsocketEnablement) {
+                service.callbackWebsocketEnablement(service.status);
+            }
             service.connectionStatus = 'Disconnected';
-            service.callbackStatus(service.connectionStatus);
+            if(service.callbackStatus){
+                service.callbackStatus(service.connectionStatus);
+            }
         };
 
         service.subscribeStatus = function (callbackStatus) {
@@ -60,8 +84,18 @@ angular.module('angularol3jsuiApp')
             service.callbackMessageReceived = callbackMessageReceived;
         };
 
+        service.subscribeMessageAmount = function (callbackMessageAmount) {
+            service.callbackMessageAmount = callbackMessageAmount;
+            if(service.callbackMessageAmount) {
+                service.callbackMessageAmount(service.msgs);
+            }
+        };
+
         service.subscribeWebsocketEnablement = function (callbackWebsocketEnablement) {
             service.callbackWebsocketEnablement = callbackWebsocketEnablement;
+            if(service.callbackWebsocketEnablement) {
+                service.callbackWebsocketEnablement(service.status);
+            }
         };
 
         service.getNextOperationLabel = function () {

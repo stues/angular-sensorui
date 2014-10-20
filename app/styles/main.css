@@ -3,6 +3,10 @@ body {
     background: rgb(28, 30, 34);
 }
 
+body {
+    padding-top: 50px;
+}
+
 .hero-unit {
     margin: 50px auto 0 auto;
     width: 300px;

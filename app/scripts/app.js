@@ -17,13 +17,52 @@ angular
     'ngSanitize',
     'ngTouch',
     'openlayers-directive'
-  ]).controller('MapCtrl', function ($scope) {
-        $scope.awesomeThings = [
-            'HTML5 Boilerplate',
-            'AngularJS',
-            'Karma'
-        ];
-    })
+  ]).controller('menuController', ['$scope', 'WebsocketGeoJSONService', function ($scope, WebsocketGeoJSONService) {
+
+        $scope.connectCommandLabel = WebsocketGeoJSONService
+            .getNextOperationLabel();
+
+        $scope.status = WebsocketGeoJSONService.connectionStatus;
+
+        $scope.showCount = false;
+
+        $scope.messageCount = 0;
+
+        $scope.messageCount = WebsocketGeoJSONService
+            .getMessageCount();
+
+        WebsocketGeoJSONService.subscribeStatus(function (message) {
+            $scope.status = message;
+            $scope.connectCommandLabel = WebsocketGeoJSONService
+                .getNextOperationLabel();
+            if(message == 'Connected'){
+                $scope.showCount = true;
+            }
+            else{
+                $scope.showCount = false;
+            }
+        });
+
+        WebsocketGeoJSONService
+            .subscribeMessageAmount(function (msgsReceived) {
+                $scope.messageCount = msgsReceived;
+                if($scope.messageCount > 0){
+                    $scope.showCount = true;
+                }
+            });
+
+        $scope.connect = function () {
+            if (!WebsocketGeoJSONService.isConnected()) {
+                WebsocketGeoJSONService.connect();
+
+                $scope.connectCommandLabel = 'Disconnect';
+            } else {
+                WebsocketGeoJSONService.disconnect();
+
+                $scope.connectCommandLabel = 'Connect';
+            }
+        };
+    }])
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {

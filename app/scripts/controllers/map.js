@@ -12,6 +12,8 @@ angular.module('angularol3jsuiApp')
 
         var stop;
 
+        var initialized = false;
+
         var geoJSONFormat = new ol.format.GeoJSON({defaultDataProjection:'EPSG:4326'});
 
         var vectorSource = new ol.source.Vector({projection:'EPSG:3857'});
@@ -68,7 +70,7 @@ angular.module('angularol3jsuiApp')
             switzerland: {
                 lat: 46.801111,
                 lon: 8.226667,
-                zoom: 7
+                zoom: 8
             },
             layers: {
                 mainlayer: {
@@ -81,23 +83,16 @@ angular.module('angularol3jsuiApp')
 
         $scope.maxLastSeen = 15000; //Delete aircrafts after 15 seconds
 
-        $scope.status = WebsocketGeoJSONService.connectionStatus;
-        $scope.connectCommandLabel = WebsocketGeoJSONService
-            .getNextOperationLabel();
-
-        $scope.showCount = false;
-        $scope.messageCount = WebsocketGeoJSONService
-            .getMessageCount();
-
-        WebsocketGeoJSONService.subscribeStatus(function (message) {
-            $scope.status = message;
-        });
-
-        WebsocketGeoJSONService
-            .subscribeWebsocketEnablement(function () {
-                $scope.connectCommandLabel = WebsocketGeoJSONService
-                    .getNextOperationLabel();
-            });
+        function init(){
+            if(!initialized) {
+                olData.getMap().then(function (map) {
+                    olData.getLayers().then(function () {
+                        map.addLayer(vectorLayer);
+                    });
+                });
+            }
+            initialized = true;
+        }
 
         WebsocketGeoJSONService.subscribeMessages(function (message) {
             updateRealTimePointFeature(message.data);
@@ -109,41 +104,25 @@ angular.module('angularol3jsuiApp')
             }
         });
 
-        $scope.connect = function () {
-            if (!WebsocketGeoJSONService.isConnected()) {
-                WebsocketGeoJSONService.connect();
-
-
-                olData.getMap().then(function (map) {
-                    olData.getLayers().then(function () {
-                        map.addLayer(vectorLayer);
-                    });
-                });
-
-
+        WebsocketGeoJSONService.subscribeWebsocketEnablement(function (enabled) {
+            if(enabled){
+                init();
                 if (!angular.isDefined(stop)) {
                     stop = $interval(function () {
                         removeOldFeatures();
                         if (!$scope.$$phase) {
                             $scope.$apply();
                         }
-                    }, 15000);
+                    }, $scope.maxLastSeen);
                 }
-                $scope.connectCommandLabel = 'Disconnect';
-            } else {
-                WebsocketGeoJSONService.disconnect();
-
+            }
+            else{
                 if (angular.isDefined(stop)) {
                     $interval.cancel(stop);
                     stop = undefined;
                 }
-
-                $scope.showCount = false;
-                $scope.connectCommandLabel = 'Connect';
             }
-            $scope.messageCount = WebsocketGeoJSONService
-                .getMessageCount();
-        };
+        });
 
         $scope.currentUTCDate = function () {
             var now = new Date();

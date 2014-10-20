@@ -1,15 +1,6 @@
 <div>
 
-    <h2>
-        Live Data
-        <button ng-click="connect()" class="btn btn-primary btn-lg"
-                ng-disabled="connectDisabled">
-            <span class="glyphicon glyphicon-flash"></span>
-            {{connectCommandLabel}}
-        </button>
-    </h2>
-
-    <openlayers height="480px" layers="layers" center="switzerland" width="640px"></openlayers>
+    <openlayers layers="layers" center="switzerland" height="480px"></openlayers>
 
     <table class="table table-striped table-bordered table-condensed table-hover table-condensed sorting">
         <tr class="h4">
@@ -35,9 +26,4 @@
         </tr>
         </tbody>
     </table>
-    <div>
-        <div style="float: left">{{status}}</div>
-        <div ng-show="showCount" style="float: right">{{messageCount}} Messages received</div>
-    </div>
-
 </div>
