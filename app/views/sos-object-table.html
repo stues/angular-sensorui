@@ -1,0 +1,19 @@
+<div>
+    <table class="table table-striped table-bordered table-condensed table-hover table-condensed sorting">
+        <tr class="h4">
+            <td>ID</td>
+            <td>Call Sign</td>
+            <td>Type</td>
+            <td>Altitude</td>
+            <td>Speed</td>
+            <td>Position Lat</td>
+            <td>Position Lon</td>
+            <td>Last Seen</td>
+        </tr>
+        <tbody ng-repeat="feature in features">
+            <tr class="{{feature.type}}" >
+            <td>{{feature}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
