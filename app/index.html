@@ -40,6 +40,7 @@
         <ul class="nav navbar-nav">
             <li><a ng-href="#/map">Map</a></li>
             <li><a ng-href="#/object-table">Features</a></li>
+            <li><a ng-href="#/sos-object-table">SOS Features</a></li>
             <li><a ng-href="#/about">About</a></li>
         </ul>
 
@@ -104,11 +105,13 @@
 
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
 <script src="scripts/app.js"></script>
-<script src="scripts/service.js"></script>
+<script src="scripts/websocket-service.js"></script>
+<script src="scripts/sos-service.js"></script>
 <script src="scripts/controllers/main.js"></script>
 <script src="scripts/controllers/about.js"></script>
 <script src="scripts/controllers/map.js"></script>
 <script src="scripts/controllers/object-table.js"></script>
+<script src="scripts/controllers/sos-object-table.js"></script>
 <!-- endbuild -->
 
 </body>

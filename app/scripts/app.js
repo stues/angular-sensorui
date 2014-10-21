@@ -9,15 +9,15 @@
  * Main module of the application.
  */
 angular
-  .module('angularol3jsuiApp', [
-    'ngAnimate',
-    'ngCookies',
-    'ngResource',
-    'ngRoute',
-    'ngSanitize',
-    'ngTouch',
-    'openlayers-directive'
-  ]).controller('menuController', ['$scope', 'WebsocketGeoJSONService', function ($scope, WebsocketGeoJSONService) {
+    .module('angularol3jsuiApp', [
+        'ngAnimate',
+        'ngCookies',
+        'ngResource',
+        'ngRoute',
+        'ngSanitize',
+        'ngTouch',
+        'openlayers-directive'
+    ]).controller('menuController', ['$scope', 'WebsocketGeoJSONService', function ($scope, WebsocketGeoJSONService) {
 
         $scope.connectCommandLabel = WebsocketGeoJSONService
             .getNextOperationLabel();
@@ -35,10 +35,10 @@ angular
             $scope.status = message;
             $scope.connectCommandLabel = WebsocketGeoJSONService
                 .getNextOperationLabel();
-            if(message == 'Connected'){
+            if (message == 'Connected') {
                 $scope.showCount = true;
             }
-            else{
+            else {
                 $scope.showCount = false;
             }
         });
@@ -46,7 +46,7 @@ angular
         WebsocketGeoJSONService
             .subscribeMessageAmount(function (msgsReceived) {
                 $scope.messageCount = msgsReceived;
-                if($scope.messageCount > 0){
+                if ($scope.messageCount > 0) {
                     $scope.showCount = true;
                 }
             });
@@ -63,25 +63,29 @@ angular
             }
         };
     }])
-  .config(function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
-      })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl'
-      })
-      .when('/map', {
-        templateUrl: 'views/map.html',
-        controller: 'MapCtrl'
-      })
-      .when('/object-table', {
-        templateUrl: 'views/object-table.html',
-        controller: 'ObjectTableCtrl'
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  });
+    .config(function ($routeProvider) {
+        $routeProvider
+            .when('/', {
+                templateUrl: 'views/main.html',
+                controller: 'MainCtrl'
+            })
+            .when('/about', {
+                templateUrl: 'views/about.html',
+                controller: 'AboutCtrl'
+            })
+            .when('/map', {
+                templateUrl: 'views/map.html',
+                controller: 'MapCtrl'
+            })
+            .when('/object-table', {
+                templateUrl: 'views/object-table.html',
+                controller: 'ObjectTableCtrl'
+            })
+            .when('/sos-object-table', {
+                templateUrl: 'views/sos-object-table.html',
+                controller: 'SOSObjectTableCtrl'
+            })
+            .otherwise({
+                redirectTo: '/'
+            });
+    });
