@@ -50,7 +50,7 @@
         </button>
         <div class="col-sm-2 col-md-2 pull-right">
             <div class="navbar-text">{{status}}</div>
-            <div ng-show="showCount" style="float: right" class="navbar-text">{{messageCount}} Messages received</div>
+            <div ng-show="showCount"  class="navbar-text">{{messageCount}} Messages received</div>
         </div>
 
     </div>
@@ -104,6 +104,7 @@
 
 
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
+<script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>
 <script src="scripts/websocket-service.js"></script>
 <script src="scripts/sos-service.js"></script>

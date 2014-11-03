@@ -2,7 +2,7 @@
 
 angular.module('angularol3jsuiApp')
     .factory('WebsocketGeoJSONService',
-    function () {
+    function (websocketConfig) {
         var service = {};
 
         service.msgs = 0;
@@ -16,7 +16,7 @@ angular.module('angularol3jsuiApp')
                 return;
             }
 
-            var ws = new WebSocket('ws://127.0.0.1:8443/traffic');
+            var ws = new WebSocket(websocketConfig.url);
 
             ws.onopen = function () {
                 service.connectionStatus = 'Connected';

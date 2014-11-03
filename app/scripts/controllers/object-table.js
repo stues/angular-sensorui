@@ -98,8 +98,6 @@ angular.module('angularol3jsuiApp')
             WebsocketGeoJSONService.subscribeMessages(function (message) {
                 updateRealTimePointFeature(message.data);
                 $scope.showCount = true;
-                $scope.messageCount = WebsocketGeoJSONService
-                    .getMessageCount();
                 if (!$scope.$$phase) {
                     $scope.$apply();
                 }

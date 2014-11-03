@@ -16,7 +16,8 @@ angular
         'ngRoute',
         'ngSanitize',
         'ngTouch',
-        'openlayers-directive'
+        'openlayers-directive',
+        'config'
     ]).controller('menuController', ['$scope', 'WebsocketGeoJSONService', function ($scope, WebsocketGeoJSONService) {
 
         $scope.connectCommandLabel = WebsocketGeoJSONService
@@ -35,7 +36,7 @@ angular
             $scope.status = message;
             $scope.connectCommandLabel = WebsocketGeoJSONService
                 .getNextOperationLabel();
-            if (message == 'Connected') {
+            if (message === 'Connected') {
                 $scope.showCount = true;
             }
             else {

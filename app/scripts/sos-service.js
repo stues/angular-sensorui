@@ -2,7 +2,7 @@
 
 angular.module('angularol3jsuiApp')
     .service('SOSJSONService',
-    function ($http, $q) {
+    function ($http, $q, sosConfig) {
 
 
         // Return public API.
@@ -11,24 +11,23 @@ angular.module('angularol3jsuiApp')
         });
 
         // I add a friend with the given name to the remote collection.
-        function getNewEntries(name) {
-
+        function getNewEntries(dateFrom, dateTo) {
             var request = $http({
                 method: "post",
-                url: "http://localhost:8080/52n-sos-webapp/sos/json",
+                url: sosConfig.url,
                 data: {
                     "request": "GetObservation",
                     "service": "SOS",
                     "version": "2.0.0",
-                    "procedure": ["http://stue.ch/sensorobservation/procedure/flighttracking"],
-                    "offering": ["http://stue.ch/sensorobservation/offering/ads-b"],
+                    "procedure": sosConfig.procedure,
+                    "offering": sosConfig.offering,
                     "temporalFilter": [
                         {
                             "during": {
                                 "ref": "om:phenomenonTime",
                                 "value": [
-                                    "2014-10-21T20:27:15+01:00",
-                                    "2014-10-21T20:27:30+01:00"
+                                    getShortISOString(dateFrom),
+                                    getShortISOString(dateTo)
                                 ]
                             }
                         }
@@ -37,6 +36,17 @@ angular.module('angularol3jsuiApp')
             });
 
             return(request.then(handleSuccess, handleError));
+        }
+
+
+        function getShortISOString(date) {
+            return date.getUTCFullYear() +
+                "-" + (date.getUTCMonth() + 1) +
+                "-" + date.getUTCDate() +
+                "T" + date.getUTCHours() +
+                ":" + date.getUTCMinutes() +
+                ":" + date.getUTCSeconds() +
+                "Z";
         }
 
         function handleError(response) {
@@ -55,4 +65,5 @@ angular.module('angularol3jsuiApp')
             return( response.data );
 
         }
-    });
+    })
+;
