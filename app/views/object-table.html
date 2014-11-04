@@ -6,7 +6,7 @@
         <tr class="h4">
             <td>ID</td>
             <td>Call Sign</td>
-            <td>Type</td>
+            <td>Heading</td>
             <td>Altitude</td>
             <td>Speed</td>
             <td>Position Lat</td>
@@ -17,12 +17,12 @@
             <tr class="{{feature.type}}" >
             <td>{{feature.properties.hexIdent}}</td>
             <td>{{feature.properties.callsign}}</td>
-            <td>{{feature.properties.type}}</td>
+            <td>{{feature.properties.track}}</td>
             <td>{{feature.properties.altitude}}ft</td>
             <td>{{feature.properties.groundSpeed}}kt</td>
             <td>{{feature.geometry.coordinates[1] | number:3}}</td>
             <td>{{feature.geometry.coordinates[0] | number:3}}</td>
-            <td>{{(currentUTCDate() - (feature.properties.messageGenerated-1)) / 1000 | number:00}}s</td>
+            <td>{{(currentUTCDate() - (feature.properties.messageReceived-1)) / 1000 | number:00}}s</td>
         </tr>
         </tbody>
     </table>

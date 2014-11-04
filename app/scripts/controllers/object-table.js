@@ -144,7 +144,7 @@ angular.module('angularol3jsuiApp')
                 var currentSeconds = currentMillis - $scope.maxLastSeen;
                 for (var id in $scope.features) {
                     var feature = $scope.features[id];
-                    var featureSeenDate = feature.properties.messageGenerated;
+                    var featureSeenDate = feature.properties.messageReceived;
                     if (currentSeconds > featureSeenDate) {
                         delete $scope.features[id];
                         var featureToRemove = vectorSource.getFeatureById(id);
@@ -163,9 +163,15 @@ angular.module('angularol3jsuiApp')
             function updateRealTimePointFeature(data) {
                 var jsonObject = JSON.parse(data);
 
+                if(!jsonObject.properties){
+                    jsonObject.properties = {};
+                }
+
+                jsonObject.properties.messageReceived = $scope.currentUTCDate();
+
                 var id = jsonObject.properties.hexIdent;
 
-                if (id !== null) {
+                if (id) {
                     $scope.features[id] = jsonObject;
 
                     if (jsonObject.geometry !== null) {
@@ -176,6 +182,9 @@ angular.module('angularol3jsuiApp')
                         if (!currentFeature) {
                             currentFeature = geoJsonFeature;
                             vectorSource.addFeature(currentFeature);
+                        }
+                        else{
+                            currentFeature.setProperties(jsonObject.properties);
                         }
                         currentFeature.setGeometry(geoJsonFeature.getGeometry());
                     }
