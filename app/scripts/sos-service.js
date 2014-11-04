@@ -4,13 +4,19 @@ angular.module('angularol3jsuiApp')
     .service('SOSJSONService',
     function ($http, $q, sosConfig) {
 
-
-        // Return public API.
+        /**
+         * The Public API
+         */
         return({
             getNewEntries: getNewEntries
         });
 
-        // I add a friend with the given name to the remote collection.
+        /**
+         * calls the configured http service to load all observation from the given date range
+         * @param dateFrom the start date
+         * @param dateTo the end date
+         * @returns {*}
+         */
         function getNewEntries(dateFrom, dateTo) {
             var request = $http({
                 method: "post",
@@ -38,7 +44,11 @@ angular.module('angularol3jsuiApp')
             return(request.then(handleSuccess, handleError));
         }
 
-
+        /**
+         * Returns the given date as short is string
+         * @param date the date
+         * @returns {string} the date string as short iso string
+         */
         function getShortISOString(date) {
             return date.getUTCFullYear() +
                 "-" + (date.getUTCMonth() + 1) +
@@ -49,10 +59,13 @@ angular.module('angularol3jsuiApp')
                 "Z";
         }
 
+        /**
+         * Callback if exception occurs
+         * @param response the response from the service
+         * @returns {Promise}
+         */
         function handleError(response) {
-            if (
-                !angular.isObject(response.data) || !response.data.message
-                ) {
+            if (!angular.isObject(response.data) || !response.data.message) {
 
                 return( $q.reject("An unknown error occurred.") );
 
@@ -60,6 +73,11 @@ angular.module('angularol3jsuiApp')
             return( $q.reject(response.data.message) );
         }
 
+        /**
+         * Callback on a successful request
+         * @param response the response from the service
+         * @returns {*}
+         */
         function handleSuccess(response) {
 
             return( response.data );
