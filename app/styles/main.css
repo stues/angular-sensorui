@@ -33,3 +33,16 @@ body {
     width: 100%;
     height: 780px;
 }
+
+.show-table-button {
+  position: fixed;
+  bottom:0px;
+  width:100%;
+}
+
+.aircraft-table {
+  position:fixed;
+  bottom:15px;
+  left:5px;
+  right:5px;
+}

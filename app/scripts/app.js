@@ -83,7 +83,7 @@ angular
                 controller: 'ObjectTableCtrl'
             })
             .when('/sos-object-table', {
-                templateUrl: 'views/sos-object-table.html',
+                templateUrl: 'views/object-table.html',
                 controller: 'SOSObjectTableCtrl'
             })
             .otherwise({
