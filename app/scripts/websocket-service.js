@@ -97,6 +97,13 @@ angular.module('angularol3jsuiApp')
             }
         };
 
+        service.sendMessage = function(message) {
+            if(service.ws
+                && service.ws.readyState === service.ws.OPEN){
+                service.ws.send(message);
+            }
+        }
+
         service.getNextOperationLabel = function () {
             if (service.ws) {
                 return 'Disconnect';

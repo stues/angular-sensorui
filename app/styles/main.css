@@ -37,7 +37,14 @@ body {
 .show-table-button {
   position: fixed;
   bottom:0px;
-  width:100%;
+  width:90%;
+}
+
+.filter-table-button{
+    position: fixed;
+    right: 0px;
+    bottom: 0px;
+    width: 10%;
 }
 
 .aircraft-table {

@@ -28,6 +28,30 @@
         }
     },
     "websocketConfig": {
-        "url": "ws://127.0.0.1:8443/traffic"
+        "url": "ws://127.0.0.1:8443/clientTrackData",
+        "areaFilter": {
+            "type":"Feature",
+            "geometry":{
+                "type":"Polygon",
+                "coordinates":[
+                    [
+                        [7.315876, 47.667385],
+                        [7.829487, 47.642409],
+                        [7.848713, 47.383623],
+                        [6.630604, 47.265401],
+                        [7.315876, 47.667385]
+                    ]
+                ]
+            },
+            "properties":{
+                "action" : "setAreaFilter"
+            }
+        },
+        "clearFilter": {
+            "type":"Feature",
+            "properties":{
+                "action" : "clearFilter"
+            }
+        }
     }
 }

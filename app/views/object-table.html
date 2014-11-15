@@ -5,6 +5,11 @@
        ng-click="showTable = !showTable">
       {{!showTable && 'Show Aircraft Table' || 'Hide Aircraft Table'}}
     </a>
+    <a class="btn pull-right filter-table-button btn-warning"
+       ng-class="{true: 'btn-danger', false: 'btn-warning'}[filterArea]"
+       ng-click="toggleFilterArea()">
+        {{!filterArea && 'Activate Area Filter' || 'Deactivate Area Filter'}}</a>
+
     <div ng-show="showTable" class="aircraft-table">
         <table class="table table-striped table-bordered table-condensed table-hover table-condensed sorting">
             <tr class="h4">

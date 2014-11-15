@@ -164,6 +164,9 @@ angular.module('angularol3jsuiApp')
                 $scope.intervalFunction();
             }
 
+            /**
+             * Performs the loading of new data
+             */
             function loadRemoteData() {
                 var fromDate;
                 if (angular.isObject($scope.latestToDate)) {
