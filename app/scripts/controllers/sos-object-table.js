@@ -82,7 +82,7 @@ angular.module('angularol3jsuiApp')
                 }
             });
 
-            $scope.maxLastSeen = 15000; //Delete aircrafts after 15 seconds
+            $scope.cleanupInterval = 15000; //Delete aircrafts after 15 seconds
 
             $scope.features = {};
 
@@ -193,7 +193,7 @@ angular.module('angularol3jsuiApp')
              */
             function removeOldFeatures() {
                 var currentMillis = $scope.currentUTCDate();
-                var currentSeconds = currentMillis - $scope.maxLastSeen;
+                var currentSeconds = currentMillis - $scope.cleanupInterval;
                 for (var id in $scope.features) {
                     var feature = $scope.features[id];
                     var featureSeenDate = feature.properties.messageReceived;

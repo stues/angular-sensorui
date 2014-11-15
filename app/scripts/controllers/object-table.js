@@ -15,6 +15,10 @@ angular.module('angularol3jsuiApp')
 
             $scope.filterArea = false;
 
+            $scope.cleanupInterval = websocketConfig.cleanupInterval; //Delete aircrafts after 15 seconds without activity
+
+            $scope.features = {};
+
             var stop;
 
             var initialized = false;
@@ -77,19 +81,19 @@ angular.module('angularol3jsuiApp')
                 title: "Filter Area",
                 source: filterAreaSource,
                 style: [new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                                color: 'red',
-                                lineDash: [4],
-                                width: 3
-                            }),
-                            fill: new ol.style.Fill({
-                                color: 'rgba(0, 0, 255, 0.05)'
-                            })
-                        })]
+                    stroke: new ol.style.Stroke({
+                        color: 'red',
+                        lineDash: [4],
+                        width: 3
+                    }),
+                    fill: new ol.style.Fill({
+                        color: 'rgba(0, 0, 255, 0.05)'
+                    })
+                })]
             });
 
             angular.extend($scope, {
-                switzerland: {
+                swiss: {
                     lat: 46.801111,
                     lon: 8.226667,
                     zoom: 7
@@ -103,10 +107,10 @@ angular.module('angularol3jsuiApp')
                 }
             });
 
-            $scope.maxLastSeen = 15000; //Delete aircrafts after 15 seconds
-
-            $scope.features = {};
-
+            /**
+             * Initializes the map
+             * adds the filterAreaLayer and the vectorLayer
+             */
             function init() {
                 if (!initialized) {
                     olData.getMap().then(function (map) {
@@ -136,7 +140,7 @@ angular.module('angularol3jsuiApp')
                             if (!$scope.$$phase) {
                                 $scope.$apply();
                             }
-                        }, $scope.maxLastSeen);
+                        }, $scope.cleanupInterval);
                     }
                 }
                 else {
@@ -147,12 +151,19 @@ angular.module('angularol3jsuiApp')
                 }
             });
 
+            /**
+             * Returns the current Zulu time
+             * @returns {Date} the current zulu time
+             */
             $scope.currentUTCDate = function () {
                 var now = new Date();
                 var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
                 return utc;
             };
 
+            /**
+             * Stop interval on destroy
+             */
             $scope.$on('$destroy', function () {
                 if (angular.isDefined(stop)) {
                     $interval.cancel(stop);
@@ -186,11 +197,11 @@ angular.module('angularol3jsuiApp')
             }
 
             /**
-             * Removes all features which are older than a given
+             * Removes all features which are older than a given range
              */
             function removeOldFeatures() {
                 var currentMillis = $scope.currentUTCDate();
-                var currentSeconds = currentMillis - $scope.maxLastSeen;
+                var currentSeconds = currentMillis - $scope.cleanupInterval;
                 for (var id in $scope.features) {
                     var feature = $scope.features[id];
                     var featureSeenDate = feature.properties.messageReceived;
@@ -205,9 +216,9 @@ angular.module('angularol3jsuiApp')
             }
 
             /**
-             *
-             * @param {Array}
-             * @returns OpenLayers.Feature.Vector
+             * Converts the given data as JSON if attribute already exist in $scope features the data will be updated.
+             * otherwise the feature will be added to the scope
+             * @param data a JSON String
              */
             function updateRealTimePointFeature(data) {
                 var jsonObject = JSON.parse(data);

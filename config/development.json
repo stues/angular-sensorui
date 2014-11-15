@@ -49,6 +49,7 @@
         },
         "clearFilter": {
             "type":"Feature",
+            "cleanupInterval":15000,
             "properties":{
                 "action" : "clearFilter"
             }

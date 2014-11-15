@@ -81,7 +81,7 @@ angular.module('angularol3jsuiApp')
             }
         });
 
-        $scope.maxLastSeen = 15000; //Delete aircrafts after 15 seconds
+        $scope.cleanupInterval = 15000; //Delete aircrafts after 15 seconds
 
         function init(){
             if(!initialized) {
@@ -113,7 +113,7 @@ angular.module('angularol3jsuiApp')
                         if (!$scope.$$phase) {
                             $scope.$apply();
                         }
-                    }, $scope.maxLastSeen);
+                    }, $scope.cleanupInterval);
                 }
             }
             else{
@@ -142,7 +142,7 @@ angular.module('angularol3jsuiApp')
          */
         function removeOldFeatures() {
             var currentMillis = $scope.currentUTCDate();
-            var currentSeconds = currentMillis - $scope.maxLastSeen;
+            var currentSeconds = currentMillis - $scope.cleanupInterval;
             var features = vectorSource.getFeatures();
             var featuresLength = features.length;
             for (var i = 0; i < featuresLength; i++) {
