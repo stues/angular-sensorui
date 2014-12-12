@@ -124,10 +124,10 @@ angular.module('angularol3jsuiApp')
             }
         });
 
-        $scope.currentUTCDate = function () {
+        $scope.currentDate = function () {
             var now = new Date();
-            var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-            return utc;
+            //var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+            return now;
         };
 
         $scope.$on('$destroy', function () {
@@ -141,7 +141,7 @@ angular.module('angularol3jsuiApp')
          * Removes all features which are older than a given
          */
         function removeOldFeatures() {
-            var currentMillis = $scope.currentUTCDate();
+            var currentMillis = $scope.currentDate();
             var currentSeconds = currentMillis - $scope.cleanupInterval;
             var features = vectorSource.getFeatures();
             var featuresLength = features.length;

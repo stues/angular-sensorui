@@ -1,0 +1,28 @@
+<div>
+  <div><br />
+    <p>Local store name: <input type="text" ng-model="deltaName">
+
+    <button type="button" class="btn" ng-click="loadLocalStore()">Load Local Store</button>
+    <button type="button" class="btn btn-danger" ng-click="clearDeltas()">Reset Local Store</button></p>
+  </div>
+  <table class="table table-striped table-bordered table-condensed table-hover table-condensed sorting">
+    <tr class="h4">
+      <td>Start Creation Time</td>
+      <td>End Creation Time</td>
+      <td>Start Received Time</td>
+      <td>End Received Time</td>
+      <td>Amount</td>
+      <td>Mean Delta</td>
+    </tr>
+    <tbody ng-repeat="savedDelta in savedDeltas">
+    <tr>
+      <td>{{savedDelta.startCreationTime}}</td>
+      <td>{{savedDelta.endCreationTime}}</td>
+      <td>{{savedDelta.startReceivedTime}}</td>
+      <td>{{savedDelta.endReceivedTime}}</td>
+      <td>{{savedDelta.amount}}</td>
+      <td>{{savedDelta.meanDelta}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
