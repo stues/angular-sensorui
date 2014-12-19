@@ -1,9 +1,11 @@
 {
   "ENV": "development",
   "sosConfig": {
-    "url": "http://192.168.1.136:8080/52n-sos-webapp/sos/json",
+    "requestType": "application/xml",
+    "jsonURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/json",
+    "poxURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/pox",
     "cleanupInterval": 15000,
-    "updateInterval": 1000,
+    "updateInterval": 1,
     "areaFilter": {
         "type": "Polygon",
         "coordinates": [
@@ -31,8 +33,8 @@
           ]
         ]
     },
-    "procedure": ["http://stue.ch/sensorobservation/procedure/flighttracking"],
-    "offering": ["http://stue.ch/sensorobservation/offering/ads-b"],
+    "procedure": "http://stue.ch/sensorobservation/procedure/flighttracking",
+    "offering": "http://stue.ch/sensorobservation/offering/ads-b",
     "properties": {
       "http://stue.ch/sensorobservation/observableProperty/callsign": {
         "type": "string",
@@ -57,7 +59,7 @@
     }
   },
   "websocketConfig": {
-    "url": "ws://192.168.1.136:8443/clientTrackData",
+    "url": "ws://127.0.0.1:8443/clientTrackData",
     "cleanupInterval": 15000,
     "areaFilter": {
       "type": "Feature",
@@ -100,6 +102,6 @@
     }
   },
   "deltaConfig": {
-    "persistInterval": 5000
+    "persistInterval": 10000
   }
 }
