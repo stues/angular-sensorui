@@ -52,7 +52,7 @@ module.exports = function (grunt) {
             },
             gruntfile: {
                 files: ['Gruntfile.js'],
-                tasks: ['ngconstant:development']
+                tasks: ['ngconstant:production']
             },
             livereload: {
                 options: {
@@ -389,12 +389,10 @@ module.exports = function (grunt) {
             ,
             production: {
                 options: {
-                    dest: '<%= yeoman.dist %>/scripts/config.js'
+                    dest: '<%= yeoman.app %>/scripts/config.js'
                 }
-                ,
-                constants: {
-                    ENV: 'production'
-                }
+		,
+               constants: grunt.file.readJSON("config/production.json")
             }
         }
     });
@@ -406,7 +404,7 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'clean:server',
-            'ngconstant:development',
+            'ngconstant:production',
             'wiredep',
             'concurrent:server',
             'autoprefixer',
