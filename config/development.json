@@ -6,7 +6,7 @@
     "jsonURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/json",
     "poxURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/pox",
     "cleanupInterval": 15000,
-    "updateInterval": 1,
+    "updateInterval": 3000,
     "areaFilter": {
         "type": "Polygon",
         "coordinates": [

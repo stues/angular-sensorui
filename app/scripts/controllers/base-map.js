@@ -117,10 +117,7 @@ function BaseMapController($scope, $interval, $controller, config, olData) {
    * Cleanup interval on destroy
    */
   $scope.$on('$destroy', function () {
-    if (angular.isDefined($scope.cleanupInterval)) {
-      $interval.cancel($scope.cleanupInterval);
-      $scope.cleanupInterval = undefined;
-    }
+    $scope.stopCleanupInterval();
   });
 
   /**

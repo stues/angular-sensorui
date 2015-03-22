@@ -34,14 +34,7 @@ angular.module('angularol3jsuiApp')
 
       ws.onerror = function () {
         service.connectionStatus = 'Unable to open Connection';
-        if (service.callbackStatus) {
-          service.callbackStatus(service.connectionStatus);
-        }
-        service.status = false;
-        if (service.callbackEnablement) {
-          service.callbackEnablement(service.status);
-        }
-        service.closeConnection();
+        service.disconnect('Unable to open Connection');
       };
 
       ws.onmessage = function (message) {
@@ -59,20 +52,27 @@ angular.module('angularol3jsuiApp')
     };
 
     function closeConnection () {
-      if (service.ws) {
+      if (service.isConnected()) {
         service.ws.close();
         service.msgs = 0;
         delete service.ws;
       }
     };
 
-    service.disconnect = function () {
+    service.disconnect = function (message ) {
       closeConnection();
       service.status = false;
       if (service.callbackEnablement) {
         service.callbackEnablement(service.status);
       }
-      service.connectionStatus = 'Disconnected';
+
+      if(message){
+        service.connectionStatus = message;
+      }
+      else{
+        service.connectionStatus = 'Disconnected';
+      }
+
       if (service.callbackStatus) {
         service.callbackStatus(service.connectionStatus);
       }
@@ -101,14 +101,14 @@ angular.module('angularol3jsuiApp')
     };
 
     service.sendMessage = function (message) {
-      if (service.ws
+      if (service.isConnected()
         && service.ws.readyState === service.ws.OPEN) {
         service.ws.send(message);
       }
     }
 
     service.getNextOperationLabel = function () {
-      if (service.ws) {
+      if (service.isConnected()) {
         return 'Disconnect';
       } else {
         return 'Connect';
@@ -116,9 +116,17 @@ angular.module('angularol3jsuiApp')
     };
 
     service.getMessageCount = function () {
-      if (service.ws) {
+      if (service.isConnected()) {
         return service.msgs;
       }
+      return;
+    };
+
+    service.getStatus = function () {
+      if (service.isConnected()) {
+        return service.connectionStatus;
+      }
+      return;
     };
 
     service.isConnected = function () {
