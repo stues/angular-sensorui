@@ -16,12 +16,12 @@ angular.module('angularol3jsuiApp')
 
       $scope.filterArea = false;
 
-      //Delete aircrafts after configured amount of time
+      //Delete aircraft after configured amount of time
       $scope.cleanupInterval = websocketConfig.cleanupInterval;
 
       $scope.features = {};
 
-      var stop;
+      var cleanupInterval;
 
       var initialized = false;
 
@@ -56,11 +56,9 @@ angular.module('angularol3jsuiApp')
           lon: 8.226667,
           zoom: 7
         },
-        layers: {
-          mainlayer: {
-            source: {
-              type: "OSM"
-            }
+        backgroundLayer: {
+          source: {
+            type: "OSM"
           }
         }
       });
@@ -78,10 +76,8 @@ angular.module('angularol3jsuiApp')
       function init() {
         if (!initialized) {
           olData.getMap().then(function (map) {
-            olData.getLayers().then(function () {
-              map.addLayer(filterAreaLayer);
-              map.addLayer(vectorLayer);
-            });
+            map.addLayer(filterAreaLayer);
+            map.addLayer(vectorLayer);
           });
         }
         initialized = true;
@@ -89,17 +85,16 @@ angular.module('angularol3jsuiApp')
 
       WebsocketGeoJSONService.subscribeMessages(function (message) {
         updateRealTimePointFeature(message.data);
-        $scope.showCount = true;
         if (!$scope.$$phase) {
           $scope.$apply();
         }
       });
 
-      WebsocketGeoJSONService.subscribeWebsocketEnablement(function (enabled) {
+      WebsocketGeoJSONService.subscribeEnablement(function (enabled) {
         if (enabled) {
           init();
-          if (!angular.isDefined(stop)) {
-            stop = $interval(function () {
+          if (!angular.isDefined(cleanupInterval)) {
+            cleanupInterval = $interval(function () {
               removeOldFeatures();
               if (!$scope.$$phase) {
                 $scope.$apply();
@@ -108,9 +103,9 @@ angular.module('angularol3jsuiApp')
           }
         }
         else {
-          if (angular.isDefined(stop)) {
-            $interval.cancel(stop);
-            stop = undefined;
+          if (angular.isDefined(cleanupInterval)) {
+            $interval.cancel(cleanupInterval);
+            cleanupInterval = undefined;
           }
         }
       });
@@ -126,12 +121,12 @@ angular.module('angularol3jsuiApp')
       };
 
       /**
-       * Stop interval on destroy
+       * Cleanup interval on destroy
        */
       $scope.$on('$destroy', function () {
-        if (angular.isDefined(stop)) {
-          $interval.cancel(stop);
-          stop = undefined;
+        if (angular.isDefined(cleanupInterval)) {
+          $interval.cancel(cleanupInterval);
+          cleanupInterval = undefined;
         }
       });
 
@@ -231,7 +226,6 @@ angular.module('angularol3jsuiApp')
       /*
        * The Following part contains the styling methods
        */
-
       var textFill = new ol.style.Fill({
         color: '#800'
       });
@@ -270,6 +264,7 @@ angular.module('angularol3jsuiApp')
        * @returns {number} the property value in radian
        */
       function degreeToRad(feature, propertyName) {
+        console.log(feature.get(propertyName));
         return feature.get(propertyName) * piToRadianFactor;
       }
 
@@ -321,7 +316,7 @@ angular.module('angularol3jsuiApp')
         }
 
         //Update style if text or icon style changed
-        if(styleChanged){
+        if (styleChanged) {
           feature.setStyle(
             new ol.style.Style({
               text: textStyle,

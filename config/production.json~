@@ -1,7 +1,6 @@
 {
   "ENV": "production",
   "sosConfig": {
-    "timeDeltaName": "sosDeltas",
     "requestType": "application/xml",
     "jsonURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/json",
     "poxURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/pox",
@@ -60,7 +59,6 @@
     }
   },
   "websocketConfig": {
-    "timeDeltaName": "websocketDeltas",
     "url": "ws://192.168.2.4:8443/clientTrackData",
     "cleanupInterval": 15000,
     "areaFilter": {
@@ -104,6 +102,6 @@
     }
   },
   "deltaConfig": {
-    "persistInterval": 60000
+    "persistInterval": 10000
   }
 }

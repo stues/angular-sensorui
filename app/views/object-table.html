@@ -1,5 +1,7 @@
 <div>
-    <openlayers layers="layers" center="switzerland"></openlayers>
+  <openlayers custom-layers="true" ol-center="switzerland">
+    <ol-layer ol-layer-properties="backgroundLayer"></ol-layer>
+  </openlayers>
     <a class="btn pull-left show-table-button"
        ng-class="{true: 'btn-success', false: 'btn-danger'}[!showTable]"
        ng-click="showTable = !showTable">

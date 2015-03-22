@@ -61,11 +61,9 @@ angular.module('angularol3jsuiApp')
           lon: 8.226667,
           zoom: 8
         },
-        layers: {
-          mainlayer: {
-            source: {
-              type: "OSM"
-            }
+        backgroundLayer: {
+          source: {
+            type: "OSM"
           }
         }
       });
@@ -82,10 +80,8 @@ angular.module('angularol3jsuiApp')
       function init() {
         if (!initialized) {
           olData.getMap().then(function (map) {
-            olData.getLayers().then(function () {
-              map.addLayer(filterAreaLayer);
-              map.addLayer(vectorLayer);
-            });
+            map.addLayer(filterAreaLayer);
+            map.addLayer(vectorLayer);
           });
         }
         initialized = true;
@@ -270,7 +266,6 @@ angular.module('angularol3jsuiApp')
       /*
        * The Following part contains the styling methods
        */
-
       var textFill = new ol.style.Fill({
         color: '#800'
       });

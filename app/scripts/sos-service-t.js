@@ -2,7 +2,7 @@
 
 angular.module('angularol3jsuiApp')
   .service('SOSJSONService',
-  function ($http, $q, $timeout, sosConfig) {
+  function ($http, $q, sosConfig) {
 
     /**
      * The Public API
