@@ -16,7 +16,9 @@ angular.module('angularol3jsuiApp')
 
       $scope.showCount = false;
 
-      $scope.onMapPage = function () {
+      $scope.onMapPage = false;
+
+      $scope.isOnMapPage = function () {
         if ($scope.getMapPage()) {
           return true;
         }
@@ -82,7 +84,7 @@ angular.module('angularol3jsuiApp')
       $scope.updateMessageCount = function (messageCount) {
         $scope.messageCount = messageCount;
         if ($scope.messageCount > 0) {
-          $scope.showCount = $scope.onMapPage() && true;
+          $scope.showCount = $scope.isOnMapPage() && true;
         }
       };
 
@@ -98,7 +100,7 @@ angular.module('angularol3jsuiApp')
         $scope.status = status;
         $scope.commandLabel = $scope.getCommandLabel();
         if (service.isConnected()) {
-          $scope.showCount = $scope.onMapPage() && true;
+          $scope.showCount = $scope.isOnMapPage() && true;
         }
         else {
           $scope.showCount = false;
@@ -144,10 +146,12 @@ angular.module('angularol3jsuiApp')
         });
 
 
-      $scope.$on('$locationChangeStart', function (event) {
+      $scope.$on('$locationChangeStart', function () {
         $scope.commandLabel = $scope.getCommandLabel();
         $scope.status = $scope.getCurrentStatus();
         $scope.messageCount = $scope.getCurrentMessageCount();
+        $scope.onMapPage = $scope.isOnMapPage();
+        $scope.showCount = $scope.getCurrentMessageCount() > 0 && $scope.isOnMapPage();
       });
 
     }]);

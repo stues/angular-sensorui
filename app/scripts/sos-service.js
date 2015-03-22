@@ -3,26 +3,20 @@
 angular.module('angularol3jsuiApp')
   .service('SOSJSONService',
   function ($http, $q, $timeout, sosConfig) {
-
     var service = {};
-
-    service.latestToDate;
-
-    service.msgs = 0;
-
-    service.connectionStatus = '';
-
-    service.status = false;
+    BaseService.call(this, service);
 
     service.interval;
+
+    service.latestToDate;
 
     /**
      * calls the configured http service to load all observation from the given date range
      * @param dateFrom the start date
      * @param dateTo the end date
-     * @returns {*}
+     * @returns {*} a promise to the results
      */
-    service.getNewEntries = function(dateFrom, dateTo) {
+    service.getNewEntries = function (dateFrom, dateTo) {
       var request;
       if (sosConfig.requestType == "application/xml") {
         request = $http({
@@ -80,107 +74,24 @@ angular.module('angularol3jsuiApp')
     }
 
     /**
-     * Returns the given date as short is string
-     * @param date the date
-     * @returns {string} the date string as short iso string
+     * Sets the given Area as Filter Area
+     * @param filterArea the filterArea
      */
-    function getShortISOString(date) {
-      return date.getUTCFullYear() +
-        "-" + (date.getUTCMonth() + 1) +
-        "-" + date.getUTCDate() +
-        "T" + date.getUTCHours() +
-        ":" + date.getUTCMinutes() +
-        ":" + date.getUTCSeconds() +
-        "Z";
-    }
+    service.setFilterArea = function (filterArea) {
+      //To be implemented
+      console.log("Do Filter Area");
+    };
 
     /**
-     * Callback if exception occurs
-     * @param response the response from the service
-     * @returns {Promise}
+     * Starts the interval to poll the data from the sos server
      */
-    function handleError(response) {
-      if (!angular.isObject(response.data) || !response.data.message) {
-        return ( $q.reject("An unknown error occurred.") );
-      }
-      return ( $q.reject(response.data.message) );
-
-      var message;
-      if (!angular.isObject(response.data) || !response.data.message) {
-        message = "An unknown error occurred.";
-      }
-      else{
-        message = response.data.message;
-      }
-
-      service.disconnect(message);
-
-
-    }
-
-    /**
-     * Callback on a successful request
-     * @param response the response from the service
-     * @returns {*}
-     */
-    function handleSuccess(response) {
-      service.msgs += response.data.observations.length;
-      if (service.callbackMessageReceived) {
-        service.callbackMessageReceived(response.data);
-      }
-
-      if (service.callbackMessageAmount) {
-        service.callbackMessageAmount(service.msgs);
-      }
-    }
-
-    /**
-     * The function to trigger the remote data loading
-     * is delayed by {@link sosConfig.updateInterval}
-     */
-    service.intervalFunction = function () {
-      service.interval = $timeout(function () {
-        service.loadRemoteData();
-      }, sosConfig.updateInterval)
-    };
-
-
-    service.subscribeStatus = function (callbackStatus) {
-      service.callbackStatus = callbackStatus;
-    };
-
-    service.subscribeMessages = function (callbackMessageReceived) {
-      service.callbackMessageReceived = callbackMessageReceived;
-    };
-
-    service.subscribeMessageAmount = function (callbackMessageAmount) {
-      service.callbackMessageAmount = callbackMessageAmount;
-      if (service.callbackMessageAmount) {
-        service.callbackMessageAmount(service.msgs);
-      }
-    };
-
-    service.subscribeEnablement = function (callbackEnablement) {
-      service.callbackEnablement = callbackEnablement;
-      if (service.callbackEnablement) {
-        service.callbackEnablement(service.status);
-      }
-    };
-
-    // Function to replicate setInterval using $timeout service.
-    service.intervalFunction = function () {
-      service.interval = $timeout(function () {
-        service.loadRemoteData();
-      }, sosConfig.updateInterval)
-    };
-
     service.connect = function () {
       if (service.interval) {
         return;
       }
 
       // Kick off the interval
-      service.intervalFunction();
+      intervalFunction();
 
       service.connectionStatus = 'Polling for Data';
       if (service.callbackStatus) {
@@ -209,10 +120,10 @@ angular.module('angularol3jsuiApp')
         service.callbackEnablement(service.status);
       }
 
-      if(message){
+      if (message) {
         service.connectionStatus = message;
       }
-      else{
+      else {
         service.connectionStatus = 'Disconnected';
       }
 
@@ -236,19 +147,15 @@ angular.module('angularol3jsuiApp')
       service.latestToDate = toDate;
       service.getNewEntries(fromDate, toDate);
 
-      if(angular.isDefined(service.interval)){
-        service.intervalFunction();
+      if (angular.isDefined(service.interval)) {
+        intervalFunction();
       }
     };
 
-    service.getNextOperationLabel = function () {
-      if (service.isConnected()) {
-        return 'Disconnect';
-      } else {
-        return 'Connect';
-      }
-    };
-
+    /**
+     * Returns whether the interval for polling is currently active or not
+     * @returns {boolean} true if active
+     */
     service.isConnected = function () {
       if (service.interval) {
         return true;
@@ -256,19 +163,69 @@ angular.module('angularol3jsuiApp')
       return false;
     };
 
-    service.getMessageCount = function () {
-      if (service.isConnected()) {
-        return service.msgs;
+    /**
+     * Callback if exception occurs
+     * @param response the response from the service
+     * @returns {Promise}
+     */
+    function handleError(response) {
+      if (!angular.isObject(response.data) || !response.data.message) {
+        return ( $q.reject("An unknown error occurred.") );
       }
-      return;
+      return ( $q.reject(response.data.message) );
+
+      var message;
+      if (!angular.isObject(response.data) || !response.data.message) {
+        message = "An unknown error occurred.";
+      }
+      else {
+        message = response.data.message;
+      }
+
+      service.disconnect(message);
+    }
+
+    /**
+     * Callback on a successful request
+     * @param response the response from the service
+     * @returns {*}
+     */
+    function handleSuccess(response) {
+      var observations = response.data.observations;
+      service.msgs += observations.length;
+      if (service.callbackMessageReceived) {
+        service.callbackMessageReceived(observations);
+      }
+
+      if (service.callbackMessageAmount) {
+        service.callbackMessageAmount(service.msgs);
+      }
+    }
+
+    /**
+     * The function to trigger the remote data loading
+     * is delayed by {@link sosConfig.updateInterval}
+     */
+    function intervalFunction() {
+      service.interval = $timeout(function () {
+        service.loadRemoteData();
+      }, sosConfig.updateInterval)
     };
 
-    service.getStatus = function () {
-      if (service.isConnected()) {
-        return service.connectionStatus;
-      }
-      return;
-    };
+    /**
+     * Returns the given date as short is string
+     * @param date the date
+     * @returns {string} the date string as short iso string
+     */
+    function getShortISOString(date) {
+      return date.getUTCFullYear() +
+        "-" + (date.getUTCMonth() + 1) +
+        "-" + date.getUTCDate() +
+        "T" + date.getUTCHours() +
+        ":" + date.getUTCMinutes() +
+        ":" + date.getUTCSeconds() +
+        "Z";
+    }
 
     return service;
   });

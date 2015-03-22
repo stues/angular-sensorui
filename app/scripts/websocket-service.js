@@ -3,16 +3,8 @@
 angular.module('angularol3jsuiApp')
   .factory('WebsocketGeoJSONService',
   function (websocketConfig) {
-
-
     var service = {};
-
-
-    service.msgs = 0;
-
-    service.connectionStatus = '';
-
-    service.status = false;
+    BaseService.call(this, service);
 
     service.connect = function () {
       if (service.ws) {
@@ -40,7 +32,7 @@ angular.module('angularol3jsuiApp')
       ws.onmessage = function (message) {
         service.msgs++;
         if (service.callbackMessageReceived) {
-          service.callbackMessageReceived(message);
+          service.callbackMessageReceived(message.data);
         }
 
         if (service.callbackMessageAmount) {
@@ -51,7 +43,7 @@ angular.module('angularol3jsuiApp')
       service.ws = ws;
     };
 
-    function closeConnection () {
+    function closeConnection() {
       if (service.isConnected()) {
         service.ws.close();
         service.msgs = 0;
@@ -59,17 +51,17 @@ angular.module('angularol3jsuiApp')
       }
     };
 
-    service.disconnect = function (message ) {
+    service.disconnect = function (message) {
       closeConnection();
       service.status = false;
       if (service.callbackEnablement) {
         service.callbackEnablement(service.status);
       }
 
-      if(message){
+      if (message) {
         service.connectionStatus = message;
       }
-      else{
+      else {
         service.connectionStatus = 'Disconnected';
       }
 
@@ -78,27 +70,16 @@ angular.module('angularol3jsuiApp')
       }
     };
 
-    service.subscribeStatus = function (callbackStatus) {
-      service.callbackStatus = callbackStatus;
-    };
-
-    service.subscribeMessages = function (callbackMessageReceived) {
-      service.callbackMessageReceived = callbackMessageReceived;
-    };
-
-    service.subscribeMessageAmount = function (callbackMessageAmount) {
-      service.callbackMessageAmount = callbackMessageAmount;
-      if (service.callbackMessageAmount) {
-        service.callbackMessageAmount(service.msgs);
+    service.setFilterArea = function (area) {
+      var message;
+      if (area) {
+        message = area;
       }
-    };
-
-    service.subscribeEnablement = function (callbackEnablement) {
-      service.callbackEnablement = callbackEnablement;
-      if (service.callbackEnablement) {
-        service.callbackEnablement(service.status);
+      else {
+        message = websocketConfig.clearFilter;
       }
-    };
+      service.sendMessage(JSON.stringify(message));
+  }
 
     service.sendMessage = function (message) {
       if (service.isConnected()
@@ -106,28 +87,6 @@ angular.module('angularol3jsuiApp')
         service.ws.send(message);
       }
     }
-
-    service.getNextOperationLabel = function () {
-      if (service.isConnected()) {
-        return 'Disconnect';
-      } else {
-        return 'Connect';
-      }
-    };
-
-    service.getMessageCount = function () {
-      if (service.isConnected()) {
-        return service.msgs;
-      }
-      return;
-    };
-
-    service.getStatus = function () {
-      if (service.isConnected()) {
-        return service.connectionStatus;
-      }
-      return;
-    };
 
     service.isConnected = function () {
       if (service.ws) {

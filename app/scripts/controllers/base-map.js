@@ -1,6 +1,6 @@
 'use strict';
 
-function BaseMapController($scope, $interval, $controller, config, olData) {
+function BaseMapController($scope, $interval, $controller, service, config, olData) {
 
   $scope.showTable = false;
 
@@ -141,6 +141,74 @@ function BaseMapController($scope, $interval, $controller, config, olData) {
     }
     console.log("Amount of Features:", i);
   }
+
+  /**
+   * Updates the given object within the map. If it does not exist already, it will be added to the map
+   * @param object the object to be added to the map
+   */
+  $scope.updateRealTimePointFeature = function(object) {
+    var id = object.id;
+
+    if (id) {
+      if (object.geometry) {
+        var geoJsonFeature = $scope.geoJSONFormat.readFeature(object, {featureProjection: 'EPSG:3857'});
+        var currentFeature = $scope.vectorSource.getFeatureById(id);
+        if (!currentFeature) {
+          currentFeature = geoJsonFeature;
+          currentFeature.setStyle($scope.getStyle(currentFeature));
+          $scope.vectorSource.addFeature(currentFeature);
+        }
+        else {
+          currentFeature.setProperties(object.properties);
+          $scope.updateStyle(currentFeature);
+        }
+        currentFeature.setGeometry(geoJsonFeature.getGeometry());
+      }
+
+      $scope.timeDeltaModel.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
+    }
+  };
+
+  /**
+   * Toggles between Filtering Area and no filter
+   */
+  $scope.toggleFilterArea = function () {
+    $scope.init();
+    var area;
+    if (!$scope.filterArea) {
+      area = config.areaFilter;
+      var geoJsonFeature = $scope.geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
+      geoJsonFeature.setId("filterArea");
+      $scope.filterAreaSource.addFeature(geoJsonFeature);
+      $scope.filterArea = true;
+    }
+    else{
+      area = undefined;
+      var featureToRemove = $scope.filterAreaSource.getFeatureById("filterArea");
+      if (featureToRemove) {
+        $scope.filterAreaSource.removeFeature(featureToRemove);
+      }
+      $scope.filterArea = false;
+    }
+    service.setFilterArea(area);
+  }
+
+  service.subscribeMessages(function (message) {
+    $scope.applyRemoteData(message);
+    if (!$scope.$$phase) {
+      $scope.$apply();
+    }
+  });
+
+  service.subscribeEnablement(function (enabled) {
+    if (enabled) {
+      $scope.init();
+      $scope.startCleanupInterval();
+    }
+    else {
+      $scope.stopCleanupInterval();
+    }
+  });
 
   /*
    * The Following part contains the styling methods

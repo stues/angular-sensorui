@@ -8,6 +8,8 @@
     "cleanupInterval": 15000,
     "updateInterval": 3000,
     "areaFilter": {
+      "type": "Feature",
+      "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
@@ -33,6 +35,16 @@
             ]
           ]
         ]
+      },
+      "properties": {
+        "action": "setAreaFilter"
+      }
+    },
+    "clearFilter": {
+      "type": "Feature",
+      "properties": {
+        "action": "clearFilter"
+      }
     },
     "procedure": "http://stue.ch/sensorobservation/procedure/flighttracking",
     "offering": "http://stue.ch/sensorobservation/offering/ads-b",
