@@ -17,26 +17,32 @@ angular.module('angularol3jsuiApp')
        * Update map with given data
        * @param data the new entries
        */
-      $scope.applyRemoteData = function(data) {
+      $scope.applyRemoteData = function (data) {
         var jsonObject = JSON.parse(data);
-
-        if (!jsonObject.properties) {
-          jsonObject.properties = {};
-        }
-        else {
-          if (jsonObject.properties.messageGenerated) {
-            jsonObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
-          }
-        }
-
-        jsonObject.properties.messageReceived = $scope.currentDate();
 
         var id = jsonObject.properties.hexIdent;
         if (id) {
-          jsonObject.id = id;
-          $scope.features[id] = jsonObject;
-        }
-        $scope.updateRealTimePointFeature(jsonObject)
-      }
+          var currentObject;
+          if (!angular.isObject($scope.features[id])) {
+            jsonObject.id = id;
+            if (jsonObject.properties.messageGenerated) {
+              jsonObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
+            }
+            $scope.features[id] = jsonObject;
+            currentObject = jsonObject;
+          }
+          else {
+            currentObject = $scope.features[id];
+            angular.extend(currentObject, jsonObject);
+          }
 
-    }]);
+          currentObject.properties.messageReceived = $scope.currentDate();
+          if (currentObject.properties.messageGenerated) {
+            currentObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
+          }
+
+          $scope.updateRealTimePointFeature(currentObject);
+        }
+      }
+    }
+  ]);
