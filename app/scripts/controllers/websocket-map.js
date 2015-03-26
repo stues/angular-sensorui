@@ -1,5 +1,14 @@
 'use strict';
 
+/**
+ * @ngdoc function
+ * @name angularol3jsuiApp.controller:WebsocketMapCtrl
+ * @description
+ * # WebsocketMapCtrl
+ * Controller which handles the received data from a Websocket:
+ *  - Aggregate the received Data with already received Feature-Data
+ *  - Display the Features on a WebMap
+ */
 angular.module('angularol3jsuiApp')
   .controller(
   'WebsocketMapCtrl',
@@ -14,7 +23,7 @@ angular.module('angularol3jsuiApp')
       BaseMapController.call(this, $scope, $interval, $controller, WebsocketGeoJSONService, websocketConfig, olData);
 
       /**
-       * Update map with given data
+       * Update the $scope.features with given data
        * @param data the new entries
        */
       $scope.applyRemoteData = function (data) {

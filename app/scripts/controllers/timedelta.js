@@ -1,5 +1,12 @@
 'use strict';
 
+/**
+ * @ngdoc function
+ * @name angularol3jsuiApp.controller:TimeDeltaCtrl
+ * @description
+ * # TimeDeltaCtrl
+ * This Controller can be used as a time logger. It stores timedeltas in a local store
+ */
 angular.module('angularol3jsuiApp')
   .controller(
   'TimeDeltaCtrl',
@@ -11,6 +18,9 @@ angular.module('angularol3jsuiApp')
 
       var persistInterval;
 
+      /**
+       * Load the Data from the configured store
+       */
       function loadVariablesFromStore(){
         $scope.savedDeltas = localStorage.getItem($scope.deltaName);
         $scope.deltas = [];
@@ -23,6 +33,9 @@ angular.module('angularol3jsuiApp')
         }
       }
 
+      /**
+       * Perform loading of the data
+       */
       $scope.loadLocalStore = function () {
         console.log($scope.deltaName);
         loadVariablesFromStore();
@@ -70,16 +83,19 @@ angular.module('angularol3jsuiApp')
         ;
       };
 
-
-      if ($scope.deltaName) {
-        $scope.loadLocalStore();
-      }
-
+      /**
+       * Clear the deltas from the local store
+       */
       $scope.clearDeltas = function () {
         $scope.savedDeltas = [];
         localStorage.setItem($scope.deltaName, JSON.stringify($scope.savedDeltas));
       };
 
+      /**
+       * Calculate the delta from the two given date object and it to the store
+       * @param creationDate the creation Date
+       * @param receivedDate the received Date
+       */
       $scope.addDelta = function (creationDate, receivedDate) {
         $scope.deltas.push({
           creationDate: creationDate.getTime(),
@@ -87,6 +103,11 @@ angular.module('angularol3jsuiApp')
           delta: receivedDate.getTime() - creationDate.getTime()
         });
       };
+
+
+      if ($scope.deltaName) {
+        $scope.loadLocalStore();
+      }
 
       /**
        * Stop interval on destroy

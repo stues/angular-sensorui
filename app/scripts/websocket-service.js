@@ -6,6 +6,11 @@ angular.module('angularol3jsuiApp')
     var service = {};
     BaseService.call(this, service);
 
+    /**
+     * Connect to the configured service and
+     * informs all subscribes whether connected
+     * or if an error occurred during connecting
+     */
     service.connect = function () {
       if (service.ws) {
         return;
@@ -43,6 +48,10 @@ angular.module('angularol3jsuiApp')
       service.ws = ws;
     };
 
+    /**
+     * Closes the connection to the websocket
+     * and deletes the service.ws instance
+     */
     function closeConnection() {
       if (service.isConnected()) {
         service.ws.close();
@@ -51,6 +60,10 @@ angular.module('angularol3jsuiApp')
       }
     };
 
+    /**
+     * Disconnect from the service inform all subscribers
+     * @param message
+     */
     service.disconnect = function (message) {
       closeConnection();
       service.status = false;
@@ -70,6 +83,11 @@ angular.module('angularol3jsuiApp')
       }
     };
 
+    /**
+     * Set the given area as filter, if area is undefined, the clearFilter
+     * from the websocketConfig will be sent
+     * @param area
+     */
     service.setFilterArea = function (area) {
       var message;
       if (area) {
@@ -79,8 +97,12 @@ angular.module('angularol3jsuiApp')
         message = websocketConfig.clearFilter;
       }
       service.sendMessage(JSON.stringify(message));
-  }
+    }
 
+    /**
+     * Sends the given message trough the websocket (if connected)
+     * @param message the message to send
+     */
     service.sendMessage = function (message) {
       if (service.isConnected()
         && service.ws.readyState === service.ws.OPEN) {
@@ -88,6 +110,10 @@ angular.module('angularol3jsuiApp')
       }
     }
 
+    /**
+     * Whether the websocket is currently connected or not
+     * @returns {boolean} true if connected otherwise false
+     */
     service.isConnected = function () {
       if (service.ws) {
         return true;

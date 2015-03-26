@@ -1,5 +1,12 @@
 'use strict';
 
+/**
+ * @ngdoc function
+ * @name BaseMapController
+ * @description
+ * # BaesMapController
+ * This Controller contains base functions for the Map Controller
+ */
 function BaseMapController($scope, $interval, $controller, service, config, olData) {
 
   $scope.showTable = false;
@@ -193,6 +200,9 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
     service.setFilterArea(area);
   }
 
+  /*
+   * Do Subscribe on service
+   */
   service.subscribeMessages(function (message) {
     $scope.applyRemoteData(message);
     if (!$scope.$$phase) {
