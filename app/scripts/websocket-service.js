@@ -20,13 +20,10 @@ angular.module('angularol3jsuiApp')
 
       ws.onopen = function () {
         service.connectionStatus = 'Connected';
-        if (service.callbackStatus) {
-          service.callbackStatus(service.connectionStatus);
-        }
-        service.status = true;
-        if (service.callbackEnablement) {
-          service.callbackEnablement(service.status);
-        }
+        service.fireStatus(service.connectionStatus);
+
+        service.enabled = true;
+        service.fireEnableState(service.enabled);
       };
 
       ws.onerror = function () {
@@ -36,13 +33,8 @@ angular.module('angularol3jsuiApp')
 
       ws.onmessage = function (message) {
         service.msgs++;
-        if (service.callbackMessageReceived) {
-          service.callbackMessageReceived(message.data);
-        }
-
-        if (service.callbackMessageAmount) {
-          service.callbackMessageAmount(service.msgs);
-        }
+        service.fireMessages(message.data)
+        service.fireMessageAmount(service.msgs);
       };
 
       service.ws = ws;
@@ -66,10 +58,8 @@ angular.module('angularol3jsuiApp')
      */
     service.disconnect = function (message) {
       closeConnection();
-      service.status = false;
-      if (service.callbackEnablement) {
-        service.callbackEnablement(service.status);
-      }
+      service.enabled = false;
+      service.fireEnableState(service.enabled);
 
       if (message) {
         service.connectionStatus = message;
@@ -77,10 +67,7 @@ angular.module('angularol3jsuiApp')
       else {
         service.connectionStatus = 'Disconnected';
       }
-
-      if (service.callbackStatus) {
-        service.callbackStatus(service.connectionStatus);
-      }
+      service.fireStatus(service.connectionStatus);
     };
 
     /**
@@ -97,7 +84,7 @@ angular.module('angularol3jsuiApp')
         message = websocketConfig.clearFilter;
       }
       service.sendMessage(JSON.stringify(message));
-    }
+    };
 
     /**
      * Sends the given message trough the websocket (if connected)
@@ -108,7 +95,7 @@ angular.module('angularol3jsuiApp')
         && service.ws.readyState === service.ws.OPEN) {
         service.ws.send(message);
       }
-    }
+    };
 
     /**
      * Whether the websocket is currently connected or not

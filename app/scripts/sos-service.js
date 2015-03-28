@@ -94,13 +94,10 @@ angular.module('angularol3jsuiApp')
       intervalFunction();
 
       service.connectionStatus = 'Polling for Data';
-      if (service.callbackStatus) {
-        service.callbackStatus(service.connectionStatus);
-      }
-      service.status = true;
-      if (service.callbackEnablement) {
-        service.callbackEnablement(service.status);
-      }
+      service.fireStatus(service.connectionStatus);
+
+      service.enabled = true;
+      service.fireEnableState(service.enabled);
     };
 
     /**
@@ -115,10 +112,8 @@ angular.module('angularol3jsuiApp')
         service.interval = undefined;
       }
 
-      service.status = false;
-      if (service.callbackEnablement) {
-        service.callbackEnablement(service.status);
-      }
+      service.enabled = false;
+      service.fireEnableState(service.enabled);
 
       if (message) {
         service.connectionStatus = message;
@@ -127,9 +122,7 @@ angular.module('angularol3jsuiApp')
         service.connectionStatus = 'Disconnected';
       }
 
-      if (service.callbackStatus) {
-        service.callbackStatus(service.connectionStatus);
-      }
+      service.fireStatus(service.connectionStatus);
     };
 
     /**
@@ -193,13 +186,9 @@ angular.module('angularol3jsuiApp')
     function handleSuccess(response) {
       var observations = response.data.observations;
       service.msgs += observations.length;
-      if (service.callbackMessageReceived) {
-        service.callbackMessageReceived(observations);
-      }
 
-      if (service.callbackMessageAmount) {
-        service.callbackMessageAmount(service.msgs);
-      }
+      service.fireMessages(observations)
+      service.fireMessageAmount(service.msgs);
     }
 
     /**

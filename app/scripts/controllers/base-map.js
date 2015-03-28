@@ -84,7 +84,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
       });
     }
     $scope.initialized = true;
-  }
+  };
 
   /**
    * Returns the current Zulu time
@@ -108,7 +108,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
         }
       }, config.cleanupInterval);
     }
-  }
+  };
 
   /**
    * Stops the cleanup interval
@@ -118,7 +118,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
       $interval.cancel($scope.cleanupInterval);
       $scope.cleanupInterval = undefined;
     }
-  }
+  };
 
   /**
    * Cleanup interval on destroy
@@ -147,7 +147,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
       }
     }
     console.log("Amount of Features:", i);
-  }
+  };
 
   /**
    * Updates the given object within the map. If it does not exist already, it will be added to the map
@@ -198,10 +198,10 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
       $scope.filterArea = false;
     }
     service.setFilterArea(area);
-  }
+  };
 
-  /*
-   * Do Subscribe on service
+  /**
+   * Do Subscribe on service to receive messages
    */
   service.subscribeMessages(function (message) {
     $scope.applyRemoteData(message);
@@ -210,7 +210,10 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
     }
   });
 
-  service.subscribeEnablement(function (enabled) {
+  /**
+   * Do subscribe on service to receive current state of the service
+   */
+  service.subscribeEnableState(function (enabled) {
     if (enabled) {
       $scope.init();
       $scope.startCleanupInterval();
@@ -288,7 +291,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
       text: getTextStyle(feature),
       image: getIconStyle(feature)
     });
-  }
+  };
 
   /**
    * Updates the style of the given feature
@@ -320,6 +323,6 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
         })
       );
     }
-  }
+  };
 
 };
