@@ -20,7 +20,14 @@ angular.module('angularol3jsuiApp')
     'websocketConfig',
     'olData',
     function ($scope, $interval, $controller, WebsocketGeoJSONService, websocketConfig, olData) {
-      BaseMapController.call(this, $scope, $interval, $controller, WebsocketGeoJSONService, websocketConfig, olData);
+      $controller('BaseMapController', {
+        $scope: $scope,
+        $interval: $interval,
+        $controller: $controller,
+        service: WebsocketGeoJSONService,
+        config: websocketConfig,
+        olData: olData
+      });
 
       /**
        * Update the $scope.features with given data

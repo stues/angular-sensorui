@@ -20,7 +20,14 @@ angular.module('angularol3jsuiApp')
     'sosConfig',
     'olData',
     function ($scope, $interval, $controller, SOSJSONService, sosConfig, olData) {
-      BaseMapController.call(this, $scope, $interval, $controller, SOSJSONService, sosConfig, olData);
+      $controller('BaseMapController', {
+        $scope: $scope,
+        $interval: $interval,
+        $controller: $controller,
+        service: SOSJSONService,
+        config: sosConfig,
+        olData: olData
+      });
 
       /**
        * Update map with given entries

@@ -1,10 +1,9 @@
 'use strict';
 
 angular.module('angularol3jsuiApp')
-  .service('SOSJSONService',
-  function ($http, $q, $timeout, sosConfig) {
-    var service = {};
-    BaseService.call(this, service);
+  .factory('SOSJSONService',
+  function ($http, $q, $timeout, sosConfig, BaseService) {
+    var service = new BaseService();
 
     service.interval = undefined;
 

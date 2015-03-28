@@ -1,10 +1,9 @@
 'use strict';
 
 angular.module('angularol3jsuiApp')
-  .factory('WebsocketGeoJSONService',
-  function (websocketConfig) {
-    var service = {};
-    BaseService.call(this, service);
+  .factory('WebsocketGeoJSONService', function (websocketConfig, BaseService) {
+
+    var service = new BaseService();
 
     /**
      * Connect to the configured service and
