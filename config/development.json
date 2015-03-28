@@ -67,7 +67,7 @@
       },
       "http://stue.ch/sensorobservation/observableProperty/speed": {
         "type": "number",
-        "name": "speed"
+        "name": "groundSpeed"
       }
     }
   },

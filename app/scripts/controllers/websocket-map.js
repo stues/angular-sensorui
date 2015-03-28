@@ -42,7 +42,7 @@ angular.module('angularol3jsuiApp')
           }
           else {
             currentObject = $scope.features[id];
-            angular.extend(currentObject, jsonObject);
+            jQuery.extend(true, currentObject, jsonObject);
           }
 
           currentObject.properties.messageReceived = $scope.currentDate();

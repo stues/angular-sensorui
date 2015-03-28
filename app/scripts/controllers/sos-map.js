@@ -34,8 +34,8 @@ angular.module('angularol3jsuiApp')
             var result = observation.result;
 
             if (!angular.isObject($scope.features[observation.featureOfInterest])) {
-              $scope.features[observation.featureOfInterest] = {}
-              $scope.features[observation.featureOfInterest].properties = {}
+              $scope.features[observation.featureOfInterest] = {};
+              $scope.features[observation.featureOfInterest].properties = {};
               $scope.features[observation.featureOfInterest].id = observation.featureOfInterest;
             }
 

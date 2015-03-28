@@ -12,12 +12,22 @@
     "angular-animate": "latest",
     "angular-touch": "latest",
     "angular-route": "latest",
-    "angular-openlayers-directive": "https://github.com/tombatossals/angular-openlayers-directive.git",
-    "ol3": "latest"
+    "angular-openlayers-directive": "https://github.com/tombatossals/angular-openlayers-directive.git"
   },
   "devDependencies": {
     "angular-mocks": "latest",
     "angular-scenario": "latest"
+  },
+  "overrides": {
+    "openlayers3": {
+      "description": "Open Layers 3",
+      "main": [
+        "build/ol.js",
+        "css/ol.css"
+      ],
+      "ignore": [
+      ]
+    }
   },
   "appPath": "app"
 }
