@@ -80,7 +80,6 @@ angular.module('angularol3jsuiApp')
             }
           }, deltaConfig.persistInterval);
         }
-        ;
       };
 
       /**

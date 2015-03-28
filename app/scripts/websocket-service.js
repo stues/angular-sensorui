@@ -33,7 +33,7 @@ angular.module('angularol3jsuiApp')
 
       ws.onmessage = function (message) {
         service.msgs++;
-        service.fireMessages(message.data)
+        service.fireMessages(message.data);
         service.fireMessageAmount(service.msgs);
       };
 
@@ -50,7 +50,7 @@ angular.module('angularol3jsuiApp')
         service.msgs = 0;
         delete service.ws;
       }
-    };
+    }
 
     /**
      * Disconnect from the service inform all subscribers
@@ -91,8 +91,8 @@ angular.module('angularol3jsuiApp')
      * @param message the message to send
      */
     service.sendMessage = function (message) {
-      if (service.isConnected()
-        && service.ws.readyState === service.ws.OPEN) {
+      if (service.isConnected() &&
+        service.ws.readyState === service.ws.OPEN) {
         service.ws.send(message);
       }
     };

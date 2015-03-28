@@ -58,5 +58,5 @@ angular.module('angularol3jsuiApp')
             $scope.updateRealTimePointFeature($scope.features[observation.featureOfInterest]);
           }
         }
-      }
+      };
     }]);

@@ -52,6 +52,6 @@ angular.module('angularol3jsuiApp')
 
           $scope.updateRealTimePointFeature(currentObject);
         }
-      }
+      };
     }
   ]);

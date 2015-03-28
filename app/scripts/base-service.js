@@ -135,7 +135,7 @@ function BaseService(service) {
               return item;
             }
           });
-        if (this.callbackHandlers[callbackHandlerName].length = 0) {
+        if (this.callbackHandlers[callbackHandlerName].length === 0) {
           delete this.callbackHandlers[callbackHandlerName];
         }
       }
@@ -196,4 +196,4 @@ function BaseService(service) {
   };
 
   return this;
-};
+}

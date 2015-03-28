@@ -17,9 +17,9 @@ angular.module('angularol3jsuiApp')
     'SOSJSONService',
     function ($scope, $location, WebsocketGeoJSONService, SOSJSONService) {
 
-      $scope.status;
+      $scope.status = undefined;
 
-      $scope.messageCount;
+      $scope.messageCount = undefined;
 
       $scope.showCount = false;
 
@@ -45,10 +45,10 @@ angular.module('angularol3jsuiApp')
       $scope.getMapPage = function () {
         var currentPath = $location.path();
         if (angular.equals(currentPath, '/websocket-map')) {
-          return "websocket";
+          return 'websocket';
         }
         else if (angular.equals(currentPath, '/sos-map')) {
-          return "sos";
+          return 'sos';
         }
       };
 
@@ -57,9 +57,9 @@ angular.module('angularol3jsuiApp')
        */
       $scope.getCurrentService = function () {
         switch ($scope.getMapPage()) {
-          case "websocket":
+          case 'websocket':
             return WebsocketGeoJSONService;
-          case "sos":
+          case 'sos':
             return SOSJSONService;
           default:
             return;
@@ -74,7 +74,7 @@ angular.module('angularol3jsuiApp')
         if (service) {
           return service.getNextOperationLabel();
         }
-        return "";
+        return '';
       };
 
       $scope.commandLabel = $scope.getCommandLabel();
@@ -148,7 +148,7 @@ angular.module('angularol3jsuiApp')
         else {
           $scope.showCount = false;
         }
-      }
+      };
 
       /**
        * Returns the current Status String
@@ -159,7 +159,7 @@ angular.module('angularol3jsuiApp')
         if (currentService) {
           return currentService.getStatus();
         }
-      }
+      };
 
       /**
        * Returns the status for the given attributes

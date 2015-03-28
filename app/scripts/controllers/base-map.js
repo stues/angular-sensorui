@@ -13,7 +13,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
 
   $scope.filterArea = false;
 
-  $scope.cleanupInterval;
+  $scope.cleanupInterval = undefined;
 
   $scope.features = {};
 
@@ -24,13 +24,13 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
   $scope.vectorSource = new ol.source.Vector({projection: 'EPSG:3857'});
 
   $scope.vectorLayer = new ol.layer.Vector({
-    title: "Tracks",
+    title: 'Tracks',
     source: $scope.vectorSource
   });
 
   $scope.filterAreaSource = new ol.source.Vector({projection: 'EPSG:3857'});
   $scope.filterAreaLayer = new ol.layer.Vector({
-    title: "Filter Area",
+    title: 'Filter Area',
     source: $scope.filterAreaSource,
     style: [new ol.style.Style({
       stroke: new ol.style.Stroke({
@@ -52,7 +52,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
     },
     backgroundLayer: {
       source: {
-        type: "OSM"
+        type: 'OSM'
       }
     },
     defaults: {
@@ -146,7 +146,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
         }
       }
     }
-    console.log("Amount of Features:", i);
+    console.log('Amount of Features:', i);
   };
 
   /**
@@ -185,13 +185,13 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
     if (!$scope.filterArea) {
       area = config.areaFilter;
       var geoJsonFeature = $scope.geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
-      geoJsonFeature.setId("filterArea");
+      geoJsonFeature.setId('filterArea');
       $scope.filterAreaSource.addFeature(geoJsonFeature);
       $scope.filterArea = true;
     }
     else{
       area = undefined;
-      var featureToRemove = $scope.filterAreaSource.getFeatureById("filterArea");
+      var featureToRemove = $scope.filterAreaSource.getFeatureById('filterArea');
       if (featureToRemove) {
         $scope.filterAreaSource.removeFeature(featureToRemove);
       }
@@ -254,7 +254,7 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
       fill: textFill,
       offsetY: halfImgSize,
       offsetX: halfImgSize
-    })
+    });
   }
 
   /**
@@ -325,4 +325,4 @@ function BaseMapController($scope, $interval, $controller, service, config, olDa
     }
   };
 
-};
+}
