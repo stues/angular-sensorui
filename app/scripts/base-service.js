@@ -7,19 +7,14 @@ function BaseService(service) {
 
   service.enabled = false;
 
-  service.callbackHandlers = {
-    status: [],
-    messages: [],
-    messageAmount: [],
-    enableState: []
-  };
+  service.callbackHandlers = {};
 
   /**
    * Subscribe a status callback
    * @param callbackStatus a callback function
    */
   service.subscribeStatus = function (callbackStatus) {
-    service.callbackHandlers.status.push(callbackStatus);
+    service.subscribe('status', callbackStatus);
   };
 
   /**
@@ -27,7 +22,7 @@ function BaseService(service) {
    * @param callbackStatus the callback to unsubscribe
    */
   service.unsubscribeStatus = function (callbackStatus) {
-    service.callbackHandlers.status = service.unsubscribe(service.callbackHandlers.status, callbackStatus);
+    service.unsubscribe('status', callbackStatus);
   };
 
   /**
@@ -35,26 +30,24 @@ function BaseService(service) {
    * @param status the new status
    */
   service.fireStatus = function (status) {
-    service.fire(service.callbackHandlers.status, status);
+    service.fire('status', status);
   };
 
   /**
    * Subscribe a message callback
    * All the messages which were received from the service are send to this callback
-   * @param callbackMessageReceived a callback function
+   * @param callbackMessages a callback function
    */
-  service.subscribeMessages = function (callbackMessageReceived) {
-    if (callbackMessageReceived) {
-      service.callbackHandlers.messages.push(callbackMessageReceived);
-    }
+  service.subscribeMessages = function (callbackMessages) {
+    service.subscribe('messages', callbackMessages);
   };
 
   /**
    * Unsubscribe the given message callback
-   * @param callbackStatus the callback to unsubscribe
+   * @param callbackMessages the callback to unsubscribe
    */
-  service.unsubscribeMessages = function (callbackMessageReceived) {
-    service.callbackHandlers.messages = service.unsubscribe(service.callbackHandlers.messages, callbackMessageReceived);
+  service.unsubscribeMessages = function (callbackMessages) {
+    service.unsubscribe('messages', callbackMessages);
   };
 
   /**
@@ -62,7 +55,7 @@ function BaseService(service) {
    * @param messages the new messages
    */
   service.fireMessages = function (messages) {
-    service.fire(service.callbackHandlers.messages, messages);
+    service.fire('messages', messages);
   };
 
   /**
@@ -70,9 +63,7 @@ function BaseService(service) {
    * @param callbackMessageAmount a callback function
    */
   service.subscribeMessageAmount = function (callbackMessageAmount) {
-    if (callbackMessageAmount) {
-      service.callbackHandlers.messageAmount.push(callbackMessageAmount);
-    }
+    service.subscribe('messageAmount', callbackMessageAmount);
   };
 
   /**
@@ -80,7 +71,7 @@ function BaseService(service) {
    * @param callbackMessageAmount the callback to unsubscribe
    */
   service.unsubscribeMessageAmount = function (callbackMessageAmount) {
-    service.callbackHandlers.messageAmount = service.unsubscribe(service.callbackHandlers.messageAmount, callbackMessageAmount);
+    service.unsubscribe('messageAmount', callbackMessageAmount);
   };
 
   /**
@@ -88,7 +79,7 @@ function BaseService(service) {
    * @param messageAmount the new message amount
    */
   service.fireMessageAmount = function (messageAmount) {
-    service.fire(service.callbackHandlers.messageAmount, messageAmount);
+    service.fire('messageAmount', messageAmount);
   };
 
   /**
@@ -96,9 +87,8 @@ function BaseService(service) {
    * @param callbackEnableState a callback function
    */
   service.subscribeEnableState = function (callbackEnableState) {
-    if (callbackEnableState) {
-      service.callbackHandlers.enableState.push(callbackEnableState);
-    }
+    service.subscribe('enableState', callbackEnableState);
+
   };
 
   /**
@@ -106,7 +96,7 @@ function BaseService(service) {
    * @param callbackMessageAmount the callback to unsubscribe
    */
   service.unsubscribeEnableState = function (callbackEnableState) {
-    service.callbackHandlers.enableState = service.unsubscribe(service.callbackHandlers.enableState, callbackEnableState);
+    service.unsubscribe('enableState', callbackEnableState);
   };
 
   /**
@@ -114,33 +104,55 @@ function BaseService(service) {
    * @param enableState the new service enableState
    */
   service.fireEnableState = function (enableState) {
-    service.fire(service.callbackHandlers.enableState, enableState);
+    service.fire('enableState', enableState);
+  };
+
+  /**
+   * Subscribes the callback to the given callback handler name
+   * @param callbackHandlerName the name of the callback
+   * @param callback the callback to subscribe
+   */
+  service.subscribe = function (callbackHandlerName, callback) {
+    if (callback) {
+      if (!this.callbackHandlers[callbackHandlerName]) {
+        this.callbackHandlers[callbackHandlerName] = [];
+      }
+      this.callbackHandlers[callbackHandlerName].push(callback);
+    }
   };
 
   /**
    * Unsubscribes the callback from the handlers list
    * @param handlers the handlers list
    * @param callback the callback to unsubscribe
-   * @returns {*} the new handlers list
    */
-  service.unsubscribe = function (handlers, callback) {
-    return handlers.filter(
-      function (item) {
-        if (item !== callback) {
-          return item;
+  service.unsubscribe = function (callbackHandlerName, callback) {
+    if (callback) {
+      if (this.callbackHandlers[callbackHandlerName]) {
+        this.callbackHandlers[callbackHandlerName] = this.callbackHandlers[callbackHandlerName].filter(
+          function (item) {
+            if (item !== callback) {
+              return item;
+            }
+          });
+        if (this.callbackHandlers[callbackHandlerName].length = 0) {
+          delete this.callbackHandlers[callbackHandlerName];
         }
-      });
+      }
+    }
   };
 
   /**
    * Fires the valueToFire to the handlers
-   * @param handlers the handlers
+   * @param callbackHandlerName the name of the callbackHandlers
    * @param valueToFire the value to fire
    */
-  service.fire = function(handlers, valueToFire) {
-    handlers.forEach(function(item) {
-      item(valueToFire);
-    });
+  service.fire = function (callbackHandlerName, valueToFire) {
+    if (this.callbackHandlers[callbackHandlerName]) {
+      this.callbackHandlers[callbackHandlerName].forEach(function (item) {
+        item(valueToFire);
+      });
+    }
   };
 
   /**
@@ -180,7 +192,7 @@ function BaseService(service) {
    * @returns {*} true if enabled otherwise false
    */
   service.getEnableState = function () {
-      return service.enableState;
+    return service.enableState;
   };
 
   return this;
