@@ -189,21 +189,21 @@ angular.module('angularol3jsuiApp')
         $scope.showCount = $scope.getCurrentMessageCount() > 0 && $scope.isOnMapPage();
       });
 
-      WebsocketGeoJSONService.subscribeStatus(function (message) {
-        $scope.updateStatus($scope.getStatus(message, WebsocketGeoJSONService), WebsocketGeoJSONService);
+      WebsocketGeoJSONService.subscribeStatus(function (status) {
+        $scope.updateStatus($scope.getStatus(status, WebsocketGeoJSONService), WebsocketGeoJSONService);
       });
 
-      SOSJSONService.subscribeStatus(function (message) {
-        $scope.updateStatus($scope.getStatus(message, SOSJSONService), SOSJSONService);
+      SOSJSONService.subscribeStatus(function (status) {
+        $scope.updateStatus($scope.getStatus(status, SOSJSONService), SOSJSONService);
       });
 
       WebsocketGeoJSONService
-        .subscribeMessageAmount(function (msgsReceived) {
-          $scope.updateMessageCount($scope.getMessageCount(msgsReceived, WebsocketGeoJSONService));
+        .subscribeMessageCount(function (messageCount) {
+          $scope.updateMessageCount($scope.getMessageCount(messageCount, WebsocketGeoJSONService));
         });
 
       SOSJSONService
-        .subscribeMessageAmount(function (msgsReceived) {
-          $scope.updateMessageCount($scope.getMessageCount(msgsReceived, SOSJSONService));
+        .subscribeMessageCount(function (messageCount) {
+          $scope.updateMessageCount($scope.getMessageCount(messageCount, SOSJSONService));
         });
     }]);

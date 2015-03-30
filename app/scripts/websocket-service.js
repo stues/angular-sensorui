@@ -18,22 +18,16 @@ angular.module('angularol3jsuiApp')
       var ws = new WebSocket(websocketConfig.url);
 
       ws.onopen = function () {
-        service.connectionStatus = 'Connected';
-        service.fireStatus(service.connectionStatus);
-
-        service.enabled = true;
-        service.fireEnableState(service.enabled);
+        service.setStatus('Connected');
+        service.setEnableState(true);
       };
 
       ws.onerror = function () {
-        service.connectionStatus = 'Unable to open Connection';
         service.disconnect('Unable to open Connection');
       };
 
       ws.onmessage = function (message) {
-        service.msgs++;
         service.fireMessages(message.data);
-        service.fireMessageAmount(service.msgs);
       };
 
       service.ws = ws;
@@ -46,7 +40,7 @@ angular.module('angularol3jsuiApp')
     function closeConnection() {
       if (service.isConnected()) {
         service.ws.close();
-        service.msgs = 0;
+        service.resetMessageCount();
         delete service.ws;
       }
     }
@@ -57,16 +51,13 @@ angular.module('angularol3jsuiApp')
      */
     service.disconnect = function (message) {
       closeConnection();
-      service.enabled = false;
-      service.fireEnableState(service.enabled);
+      service.setEnableState(false);
 
-      if (message) {
-        service.connectionStatus = message;
+      var connectionStatusMessage = message;
+      if (!connectionStatusMessage) {
+        connectionStatusMessage = 'Disconnected';
       }
-      else {
-        service.connectionStatus = 'Disconnected';
-      }
-      service.fireStatus(service.connectionStatus);
+      service.setStatus(connectionStatusMessage);
     };
 
     /**

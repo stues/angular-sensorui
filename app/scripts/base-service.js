@@ -4,11 +4,11 @@ angular.module('angularol3jsuiApp').factory('BaseService', function () {
   return function () {
     var service = {};
 
-    service.msgs = 0;
+    service.enabled = false;
 
     service.connectionStatus = '';
 
-    service.enabled = false;
+    service.messageCount = 0;
 
     service.callbackHandlers = {};
 
@@ -58,31 +58,32 @@ angular.module('angularol3jsuiApp').factory('BaseService', function () {
      * @param messages the new messages
      */
     service.fireMessages = function (messages) {
+      service.incrementMessageCount();
       service.fire('messages', messages);
     };
 
     /**
-     * Subscribe a message amount callback
-     * @param callbackMessageAmount a callback function
+     * Subscribe a message count callback
+     * @param callbackMessageCount a callback function
      */
-    service.subscribeMessageAmount = function (callbackMessageAmount) {
-      service.subscribe('messageAmount', callbackMessageAmount);
+    service.subscribeMessageCount = function (callbackMessageCount) {
+      service.subscribe('messageCount', callbackMessageCount);
     };
 
     /**
-     * Unsubscribe the given message amount callback
-     * @param callbackMessageAmount the callback to unsubscribe
+     * Unsubscribe the given message count callback
+     * @param callbackMessageCount the callback to unsubscribe
      */
-    service.unsubscribeMessageAmount = function (callbackMessageAmount) {
-      service.unsubscribe('messageAmount', callbackMessageAmount);
+    service.unsubscribeMessageCount = function (callbackMessageCount) {
+      service.unsubscribe('messageCount', callbackMessageCount);
     };
 
     /**
-     * Fires the new messages to the handlers
-     * @param messageAmount the new message amount
+     * Fires the new messages count to the handlers
+     * @param messageCount the new message amount
      */
-    service.fireMessageAmount = function (messageAmount) {
-      service.fire('messageAmount', messageAmount);
+    service.fireMessageCount = function (messageCount) {
+      service.fire('messageCount', messageCount);
     };
 
     /**
@@ -96,7 +97,7 @@ angular.module('angularol3jsuiApp').factory('BaseService', function () {
 
     /**
      * Unsubscribe the given message enableState callback
-     * @param callbackMessageAmount the callback to unsubscribe
+     * @param callbackEnableState the callback to unsubscribe
      */
     service.unsubscribeEnableState = function (callbackEnableState) {
       service.unsubscribe('enableState', callbackEnableState);
@@ -171,13 +172,38 @@ angular.module('angularol3jsuiApp').factory('BaseService', function () {
     };
 
     /**
+     * Sets the messageCount to 0 and informs all the registered callbacks
+     */
+    service.resetMessageCount = function(){
+      service.messageCount = 0;
+      service.fireMessageCount(service.messageCount);
+    };
+
+    /**
+     * Increments the message count and informs all the registered callbacks
+     */
+    service.incrementMessageCount = function(){
+      service.messageCount++;
+      service.fireMessageCount(service.messageCount);
+    };
+
+    /**
      * Returns the send message count
      * @returns {number} the send message count
      */
     service.getMessageCount = function () {
       if (service.isConnected()) {
-        return service.msgs;
+        return service.messageCount;
       }
+    };
+
+    /**
+     * Set a new connection status and inform all the registered callbacks
+     * @param enabled the new connection status
+     */
+    service.setStatus = function(connectionStatus){
+      service.connectionStatus = connectionStatus;
+      service.fireStatus(service.connectionStatus);
     };
 
     /**
@@ -188,6 +214,15 @@ angular.module('angularol3jsuiApp').factory('BaseService', function () {
       if (service.isConnected()) {
         return service.connectionStatus;
       }
+    };
+
+    /**
+     * Set the current enable state and inform all the registrered callbacks
+     * @param enabled the new enable state
+     */
+    service.setEnableState = function(enabled){
+      service.enabled = enabled;
+      service.fireEnableState(service.enabled);
     };
 
     /**

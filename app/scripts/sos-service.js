@@ -92,11 +92,9 @@ angular.module('angularol3jsuiApp')
       // Kick off the interval
       intervalFunction();
 
-      service.connectionStatus = 'Polling for Data';
-      service.fireStatus(service.connectionStatus);
+      service.setStatus('Polling for Data');
 
-      service.enabled = true;
-      service.fireEnableState(service.enabled);
+      service.setEnableState(true);
     };
 
     /**
@@ -107,21 +105,18 @@ angular.module('angularol3jsuiApp')
 
       if (angular.isDefined(service.interval)) {
         $timeout.cancel(service.interval);
-        service.msgs = 0;
+        service.resetMessageCount();
         service.interval = undefined;
       }
 
-      service.enabled = false;
-      service.fireEnableState(service.enabled);
+      service.setEnableState(false);
 
-      if (message) {
-        service.connectionStatus = message;
-      }
-      else {
-        service.connectionStatus = 'Disconnected';
+      var connectionStatusMessage = message;
+      if (!connectionStatusMessage) {
+        connectionStatusMessage = 'Disconnected';
       }
 
-      service.fireStatus(service.connectionStatus);
+      service.setStatus(connectionStatusMessage);
     };
 
     /**
@@ -184,10 +179,7 @@ angular.module('angularol3jsuiApp')
      */
     function handleSuccess(response) {
       var observations = response.data.observations;
-      service.msgs += observations.length;
-
       service.fireMessages(observations);
-      service.fireMessageAmount(service.msgs);
     }
 
     /**
