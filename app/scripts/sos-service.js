@@ -178,8 +178,48 @@ angular.module('angularol3jsuiApp')
      * @returns {*}
      */
     function handleSuccess(response) {
+      var geoFeatures = convertToFeatures(response);
+      service.fireMessages(geoFeatures);
+    }
+
+    /**
+     * Converts the given response to a collection of features
+     * @param response the reponse from a successfull server call
+     * @returns {{}} a "map" object with feature id to feature
+     */
+    function convertToFeatures(response) {
       var observations = response.data.observations;
-      service.fireMessages(observations);
+      var observationsLength = observations.length;
+      var features = {};
+      for (var i = 0; i < observationsLength; i++) {
+        var observation = observations[i];
+        if (observation.observableProperty in sosConfig.properties) {
+          var result = observation.result;
+
+          if (!angular.isObject(features[observation.featureOfInterest])) {
+            features[observation.featureOfInterest] = {};
+            features[observation.featureOfInterest].properties = {};
+            features[observation.featureOfInterest].id = observation.featureOfInterest;
+          }
+
+          features[observation.featureOfInterest].properties.messageGenerated = new Date(observation.resultTime);
+          features[observation.featureOfInterest].properties.messageReceived = new Date();
+
+          var propertyType = sosConfig.properties[observation.observableProperty].type;
+          var propertyName = sosConfig.properties[observation.observableProperty].name;
+
+          if (propertyType === 'number') {
+            features[observation.featureOfInterest].properties[propertyName] = result.value;
+          }
+          else if (propertyType === 'string') {
+            features[observation.featureOfInterest].properties[propertyName] = result;
+          }
+          else if (propertyType === 'geojson') {
+            features[observation.featureOfInterest][propertyName] = result;
+          }
+        }
+      }
+      return features;
     }
 
     /**

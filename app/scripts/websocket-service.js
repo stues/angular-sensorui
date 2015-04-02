@@ -27,11 +27,60 @@ angular.module('angularol3jsuiApp')
       };
 
       ws.onmessage = function (message) {
-        service.fireMessages(message.data);
+        var geoFeatures = convertToFeatures(message);
+        service.fireMessages(geoFeatures);
       };
 
       service.ws = ws;
     };
+
+    /**
+     * Converts the given message to a collection of features
+     * @param message the message from a websocket
+     * @returns {{}} a "map" object with feature id to feature
+     */
+    function convertToFeatures(message) {
+      var jsonObjectString = message.data;
+      var jsonObjects = JSON.parse(jsonObjectString);
+
+      var features = {}
+      if ($.isArray(jsonObjects)) {
+        for (var jsonObject in jsonObjects) {
+          var feature = convertToFeature(jsonObject);
+          if (feature) {
+            if(features[feature.id]){
+              $.extend(true, features[feature.id], jsonObject);
+            }
+            else{
+              features[feature.id] = jsonObject;
+            }
+          }
+        }
+      }
+      else {
+        var feature = convertToFeature(jsonObjects);
+        if (feature) {
+          features[feature.id] = feature;
+        }
+      }
+      return features;
+    }
+
+    /**
+     * Converts the given jsonObject to a feature which can be displayed within the ui
+     * @param jsonObject the jsonObejct to update
+     */
+    function convertToFeature(jsonObject) {
+      if (jsonObject.properties.hexIdent) {
+        var id = jsonObject.properties.hexIdent;
+        if (id) {
+          jsonObject.id = id;
+          jsonObject.properties.messageReceived = new Date();
+          jsonObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
+        }
+        return jsonObject
+      }
+    }
 
     /**
      * Closes the connection to the websocket

@@ -113,15 +113,15 @@ angular.module('angularol3jsuiApp').factory('BaseService', function () {
 
     /**
      * Subscribes the callback to the given callback handler name
-     * @param callbackHandlerName the name of the callback
+     * @param propertyName the name of the callback
      * @param callback the callback to subscribe
      */
-    service.subscribe = function (callbackHandlerName, callback) {
+    service.subscribe = function (propertyName, callback) {
       if (callback) {
-        if (!this.callbackHandlers[callbackHandlerName]) {
-          this.callbackHandlers[callbackHandlerName] = [];
+        if (!this.callbackHandlers[propertyName]) {
+          this.callbackHandlers[propertyName] = [];
         }
-        this.callbackHandlers[callbackHandlerName].push(callback);
+        this.callbackHandlers[propertyName].push(callback);
       }
     };
 
@@ -130,31 +130,31 @@ angular.module('angularol3jsuiApp').factory('BaseService', function () {
      * @param handlers the handlers list
      * @param callback the callback to unsubscribe
      */
-    service.unsubscribe = function (callbackHandlerName, callback) {
+    service.unsubscribe = function (propertyName, callback) {
       if (callback) {
-        if (this.callbackHandlers[callbackHandlerName]) {
-          this.callbackHandlers[callbackHandlerName] = this.callbackHandlers[callbackHandlerName].filter(
+        if (this.callbackHandlers[propertyName]) {
+          this.callbackHandlers[propertyName] = this.callbackHandlers[propertyName].filter(
             function (item) {
               if (item !== callback) {
                 return item;
               }
             });
-          if (this.callbackHandlers[callbackHandlerName].length === 0) {
-            delete this.callbackHandlers[callbackHandlerName];
+          if (this.callbackHandlers[propertyName].length === 0) {
+            delete this.callbackHandlers[propertyName];
           }
         }
       }
     };
 
     /**
-     * Fires the valueToFire to the handlers
-     * @param callbackHandlerName the name of the callbackHandlers
-     * @param valueToFire the value to fire
+     * Fires the newValue to the handlers
+     * @param propertyName the name of the callbackHandlers
+     * @param newValue the value to fire
      */
-    service.fire = function (callbackHandlerName, valueToFire) {
-      if (this.callbackHandlers[callbackHandlerName]) {
-        this.callbackHandlers[callbackHandlerName].forEach(function (item) {
-          item(valueToFire);
+    service.fire = function (propertyName, newValue) {
+      if (this.callbackHandlers[propertyName]) {
+        this.callbackHandlers[propertyName].forEach(function (item) {
+          item(newValue);
         });
       }
     };

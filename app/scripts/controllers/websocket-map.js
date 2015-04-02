@@ -28,37 +28,5 @@ angular.module('angularol3jsuiApp')
         config: websocketConfig,
         olData: olData
       });
-
-      /**
-       * Update the $scope.features with given data
-       * @param data the new entries
-       */
-      $scope.applyRemoteData = function (data) {
-        var jsonObject = JSON.parse(data);
-
-        var id = jsonObject.properties.hexIdent;
-        if (id) {
-          var currentObject;
-          if (!angular.isObject($scope.features[id])) {
-            jsonObject.id = id;
-            if (jsonObject.properties.messageGenerated) {
-              jsonObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
-            }
-            $scope.features[id] = jsonObject;
-            currentObject = jsonObject;
-          }
-          else {
-            currentObject = $scope.features[id];
-            jQuery.extend(true, currentObject, jsonObject);
-          }
-
-          currentObject.properties.messageReceived = $scope.currentDate();
-          if (currentObject.properties.messageGenerated) {
-            currentObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
-          }
-
-          $scope.updateRealTimePointFeature(currentObject);
-        }
-      };
     }
   ]);

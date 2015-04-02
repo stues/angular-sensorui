@@ -12,13 +12,13 @@ angular.module('angularol3jsuiApp')
   'BaseMapController',
   function ($scope, $interval, $controller, service, config, olData) {
 
+    $scope.features = {};
+
     $scope.showTable = false;
 
     $scope.filterArea = false;
 
     $scope.cleanupInterval = undefined;
-
-    $scope.features = {};
 
     $scope.initialized = false;
 
@@ -94,9 +94,7 @@ angular.module('angularol3jsuiApp')
      * @returns {Date} the current zulu time
      */
     $scope.currentDate = function () {
-      var now = new Date();
-      //var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-      return now;
+      return new Date();
     };
 
     /**
@@ -212,6 +210,17 @@ angular.module('angularol3jsuiApp')
         $scope.$apply();
       }
     });
+
+    /**
+     * Update the $scope.features with given data
+     * @param features the new values
+     */
+    $scope.applyRemoteData = function (features) {
+      $.extend(true, $scope.features, features);
+      for(var featureId in features){
+        $scope.updateRealTimePointFeature($scope.features[featureId]);
+      }
+    };
 
     /**
      * Do subscribe on service to receive current state of the service
