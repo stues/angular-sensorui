@@ -43,16 +43,16 @@ angular.module('angularol3jsuiApp')
       var jsonObjectString = message.data;
       var jsonObjects = JSON.parse(jsonObjectString);
 
-      var features = {}
-      if ($.isArray(jsonObjects)) {
+      var features = {};
+      if (angular.isArray(jsonObjects)) {
         for (var jsonObject in jsonObjects) {
-          var feature = convertToFeature(jsonObject);
-          if (feature) {
-            if(features[feature.id]){
-              $.extend(true, features[feature.id], jsonObject);
+          var currentFeature = convertToFeature(jsonObject);
+          if (currentFeature) {
+            if(features[currentFeature.id]){
+              $.extend(true, features[currentFeature.id], jsonObject);
             }
             else{
-              features[feature.id] = jsonObject;
+              features[currentFeature.id] = jsonObject;
             }
           }
         }
@@ -78,7 +78,7 @@ angular.module('angularol3jsuiApp')
           jsonObject.properties.messageReceived = new Date();
           jsonObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
         }
-        return jsonObject
+        return jsonObject;
       }
     }
 

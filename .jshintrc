@@ -20,7 +20,7 @@
   "smarttabs": true,
   "globals": {
     "angular": false,
-    "jQuery": false,
+    "$": false,
     "ol": false,
     "BaseService": false,
     "BaseMapController": false
