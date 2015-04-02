@@ -1,5 +1,16 @@
 'use strict';
 
+/**
+ * @ngdoc factory
+ * @name SOSJSONService
+ * @description
+ * # SOSJSONService
+ * This factory extends the BaseService, it can be used to load Observations from a SOS Server
+ * The sosConfig must contain the name and the types of the expected Observations
+ * and the procedure, offering and the Url to the SOS Server if can either be a Pox or a Json URL
+ *
+ * Once this service is connected it polls for new data from the SOS-Server
+ */
 angular.module('angularol3jsuiApp')
   .factory('SOSJSONService',
   function ($http, $q, $timeout, sosConfig, BaseService) {

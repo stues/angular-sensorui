@@ -1,5 +1,17 @@
 'use strict';
 
+/**
+ * @ngdoc factory
+ * @name BaseService
+ * @description
+ * # BaseService
+ * Returns a function to create a new service which can handle callbacks
+ * It provides callback helper methods for the following Attributes:
+ *  - enabled (Status of the service)
+ *  - connectionStatus (Current Connections String of the service)
+ *  - messageCount (The amount of messages received since last disconnect)
+ *  - messages (The messages received from the remote service)
+ */
 angular.module('angularol3jsuiApp').factory('BaseService', function () {
   return function () {
     var service = {};

@@ -1,5 +1,16 @@
 'use strict';
 
+/**
+ * @ngdoc factory
+ * @name WebsocketGeoJSONService
+ * @description
+ * # WebsocketGeoJSONService
+ * This factory extends the BaseService, it can be used to load GeoJSON Objects from a Websocket
+ * The websocketConfig must only contain the URL of the Websocket to Connect.
+ * Furthermore a message to clear the filter from this websocket can be defined in the websocketConfig
+ *
+ * Once this service is connected it received data will be published with the fireMessages method
+ */
 angular.module('angularol3jsuiApp')
   .factory('WebsocketGeoJSONService', function (websocketConfig, BaseService) {
 
@@ -48,10 +59,10 @@ angular.module('angularol3jsuiApp')
         for (var jsonObject in jsonObjects) {
           var currentFeature = convertToFeature(jsonObject);
           if (currentFeature) {
-            if(features[currentFeature.id]){
+            if (features[currentFeature.id]) {
               $.extend(true, features[currentFeature.id], jsonObject);
             }
-            else{
+            else {
               features[currentFeature.id] = jsonObject;
             }
           }
