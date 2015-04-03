@@ -79,6 +79,14 @@ angular.module('angularol3jsuiApp')
     };
 
     /**
+     * Whether the websocket is currently connected or not
+     * @returns {boolean} true if connected otherwise false
+     */
+    service.isConnected = function () {
+      return angular.isObject(websocket);
+    };
+
+    /**
      * Converts the given message to a collection of features
      * @param message the message from a websocket
      * @returns {{}} a "map" object with feature id to feature
@@ -90,13 +98,15 @@ angular.module('angularol3jsuiApp')
       var features = {};
       if (angular.isArray(jsonObjects)) {
         for (var jsonObject in jsonObjects) {
-          var currentFeature = convertToFeature(jsonObject);
-          if (currentFeature) {
-            if (features[currentFeature.id]) {
-              $.extend(true, features[currentFeature.id], jsonObject);
-            }
-            else {
-              features[currentFeature.id] = jsonObject;
+          if (jsonObjects.hasOwnProperty(jsonObject)) {
+            var currentFeature = convertToFeature(jsonObject);
+            if (currentFeature) {
+              if (features[currentFeature.id]) {
+                $.extend(true, features[currentFeature.id], jsonObject);
+              }
+              else {
+                features[currentFeature.id] = jsonObject;
+              }
             }
           }
         }
@@ -147,18 +157,7 @@ angular.module('angularol3jsuiApp')
         websocket.readyState === websocket.OPEN) {
         websocket.send(message);
       }
-    };
-
-    /**
-     * Whether the websocket is currently connected or not
-     * @returns {boolean} true if connected otherwise false
-     */
-    service.isConnected = function () {
-      if (angular.isObject(websocket)) {
-        return true;
-      }
-      return false;
-    };
+    }
 
     return service;
   });

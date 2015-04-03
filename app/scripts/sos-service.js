@@ -21,15 +21,6 @@ angular.module('angularol3jsuiApp')
     var latestToDate = null;
 
     /**
-     * Sets the given Area as Filter Area
-     * @param filterArea the filterArea
-     */
-    service.setFilterArea = function (filterArea) {
-      //To be implemented
-      console.log('Do set filter area: ' + filterArea);
-    };
-
-    /**
      * Starts the interval to poll the data from the sos server
      */
     service.connect = function () {
@@ -65,6 +56,23 @@ angular.module('angularol3jsuiApp')
       }
 
       service.setStatus(connectionStatusMessage);
+    };
+
+    /**
+     * Returns whether the interval for polling is currently active or not
+     * @returns {boolean} true if active
+     */
+    service.isConnected = function () {
+      return(angular.isObject(interval));
+    };
+
+    /**
+     * Sets the given Area as Filter Area
+     * @param filterArea the filterArea
+     */
+    service.setFilterArea = function (filterArea) {
+      //To be implemented
+      console.log('Do set filter area: ' + filterArea);
     };
 
     /**
@@ -128,7 +136,7 @@ angular.module('angularol3jsuiApp')
         throw 'Unknown Request Type';
       }
       return (request.then(handleSuccess, handleError));
-    };
+    }
 
     /**
      * Performs the loading of new data
@@ -148,18 +156,7 @@ angular.module('angularol3jsuiApp')
       if (angular.isObject(interval)) {
         intervalFunction();
       }
-    };
-
-    /**
-     * Returns whether the interval for polling is currently active or not
-     * @returns {boolean} true if active
-     */
-    service.isConnected = function () {
-      if (interval) {
-        return true;
-      }
-      return false;
-    };
+    }
 
     /**
      * Callback if exception occurs
