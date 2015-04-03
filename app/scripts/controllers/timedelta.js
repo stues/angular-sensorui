@@ -47,7 +47,9 @@ angular.module('angularol3jsuiApp')
               var amount = $scope.deltas.length;
               var meanDelta = 0;
               for (var i in $scope.deltas) {
-                meanDelta += $scope.deltas[i].delta;
+                if($scope.deltas.hasOwnProperty(i)){
+                  meanDelta += $scope.deltas[i].delta;
+                }
               }
 
               var startCreationTime = $scope.deltas[0].creationDate;

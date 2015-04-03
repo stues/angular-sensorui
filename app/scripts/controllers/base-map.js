@@ -128,14 +128,16 @@ angular.module('angularol3jsuiApp')
       var currentSeconds = currentMillis - config.cleanupInterval;
       var i = 0;
       for (var id in $scope.features) {
-        i++;
-        var feature = $scope.features[id];
-        var featureSeenDate = feature.properties.messageReceived;
-        if (currentSeconds > featureSeenDate) {
-          delete $scope.features[id];
-          var featureToRemove = $scope.vectorSource.getFeatureById(id);
-          if (featureToRemove) {
-            $scope.vectorSource.removeFeature(featureToRemove);
+        if ($scope.features.hasOwnProperty(id)) {
+          i++;
+          var feature = $scope.features[id];
+          var featureSeenDate = feature.properties.messageReceived;
+          if (currentSeconds > featureSeenDate) {
+            delete $scope.features[id];
+            var featureToRemove = $scope.vectorSource.getFeatureById(id);
+            if (featureToRemove) {
+              $scope.vectorSource.removeFeature(featureToRemove);
+            }
           }
         }
       }
@@ -209,8 +211,10 @@ angular.module('angularol3jsuiApp')
      */
     $scope.applyRemoteData = function (features) {
       $.extend(true, $scope.features, features);
-      for(var featureId in features){
-        $scope.updateRealTimePointFeature($scope.features[featureId]);
+      for (var featureId in features) {
+        if ($scope.features.hasOwnProperty(featureId)) {
+          $scope.updateRealTimePointFeature($scope.features[featureId]);
+        }
       }
     };
 

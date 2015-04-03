@@ -29,21 +29,16 @@ body {
     background-color: red;
 }
 
-.geomap {
-    width: 100%;
-    height: 780px;
-}
-
 .show-table-button {
   position: fixed;
-  bottom:0px;
+  bottom:0;
   width:90%;
 }
 
 .filter-table-button{
     position: fixed;
-    right: 0px;
-    bottom: 0px;
+    right: 0;
+    bottom: 0;
     width: 10%;
 }
 

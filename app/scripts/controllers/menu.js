@@ -30,12 +30,7 @@ angular.module('angularol3jsuiApp')
        * @returns {boolean} true if on Map Page otherwise false
        */
       $scope.isOnMapPage = function () {
-        if ($scope.getMapPage()) {
-          return true;
-        }
-        else {
-          return false;
-        }
+        return angular.isDefined($scope.getMapPage());
       };
 
       /**
@@ -175,7 +170,6 @@ angular.module('angularol3jsuiApp')
         if (currentService) {
           return currentService.getStatus();
         }
-        return;
       };
 
       /**
