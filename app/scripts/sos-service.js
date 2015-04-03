@@ -16,9 +16,56 @@ angular.module('angularol3jsuiApp')
   function ($http, $q, $timeout, sosConfig, BaseService) {
     var service = new BaseService();
 
-    service.interval = undefined;
+    var interval = null;
 
-    service.latestToDate = undefined;
+    var latestToDate = null;
+
+    /**
+     * Sets the given Area as Filter Area
+     * @param filterArea the filterArea
+     */
+    service.setFilterArea = function (filterArea) {
+      //To be implemented
+      console.log('Do set filter area: ' + filterArea);
+    };
+
+    /**
+     * Starts the interval to poll the data from the sos server
+     */
+    service.connect = function () {
+      if (angular.isObject(interval)) {
+        return;
+      }
+
+      // Kick off the interval
+      intervalFunction();
+
+      service.setStatus('Polling for Data');
+
+      service.setEnableState(true);
+    };
+
+    /**
+     * Stops the update interval
+     * then informs the subscribers
+     */
+    service.disconnect = function (message) {
+
+      if (angular.isObject(interval)) {
+        $timeout.cancel(interval);
+        service.resetMessageCount();
+        interval = null;
+      }
+
+      service.setEnableState(false);
+
+      var connectionStatusMessage = message;
+      if (!connectionStatusMessage) {
+        connectionStatusMessage = 'Disconnected';
+      }
+
+      service.setStatus(connectionStatusMessage);
+    };
 
     /**
      * calls the configured http service to load all observation from the given date range
@@ -26,7 +73,7 @@ angular.module('angularol3jsuiApp')
      * @param dateTo the end date
      * @returns {*} a promise to the results
      */
-    service.getNewEntries = function (dateFrom, dateTo) {
+    function getNewEntries(dateFrom, dateTo) {
       var request;
       if (sosConfig.requestType === 'application/xml') {
         request = $http({
@@ -84,68 +131,21 @@ angular.module('angularol3jsuiApp')
     };
 
     /**
-     * Sets the given Area as Filter Area
-     * @param filterArea the filterArea
-     */
-    service.setFilterArea = function (filterArea) {
-      //To be implemented
-      console.log('Do Filter Area' + filterArea);
-    };
-
-    /**
-     * Starts the interval to poll the data from the sos server
-     */
-    service.connect = function () {
-      if (service.interval) {
-        return;
-      }
-
-      // Kick off the interval
-      intervalFunction();
-
-      service.setStatus('Polling for Data');
-
-      service.setEnableState(true);
-    };
-
-    /**
-     * Stops the update interval
-     * then informs the subscribers
-     */
-    service.disconnect = function (message) {
-
-      if (angular.isDefined(service.interval)) {
-        $timeout.cancel(service.interval);
-        service.resetMessageCount();
-        service.interval = undefined;
-      }
-
-      service.setEnableState(false);
-
-      var connectionStatusMessage = message;
-      if (!connectionStatusMessage) {
-        connectionStatusMessage = 'Disconnected';
-      }
-
-      service.setStatus(connectionStatusMessage);
-    };
-
-    /**
      * Performs the loading of new data
      */
-    service.loadRemoteData = function () {
+    function loadRemoteData() {
       var fromDate;
-      if (angular.isObject(service.latestToDate)) {
-        fromDate = service.latestToDate;
+      if (angular.isObject(latestToDate)) {
+        fromDate = latestToDate;
       }
       else {
         fromDate = new Date(new Date() - sosConfig.updateInterval);
       }
       var toDate = new Date();
-      service.latestToDate = toDate;
-      service.getNewEntries(fromDate, toDate);
+      latestToDate = toDate;
+      getNewEntries(fromDate, toDate);
 
-      if (angular.isDefined(service.interval)) {
+      if (angular.isObject(interval)) {
         intervalFunction();
       }
     };
@@ -155,7 +155,7 @@ angular.module('angularol3jsuiApp')
      * @returns {boolean} true if active
      */
     service.isConnected = function () {
-      if (service.interval) {
+      if (interval) {
         return true;
       }
       return false;
@@ -238,8 +238,8 @@ angular.module('angularol3jsuiApp')
      * is delayed by {@link sosConfig.updateInterval}
      */
     function intervalFunction() {
-      service.interval = $timeout(function () {
-        service.loadRemoteData();
+      interval = $timeout(function () {
+        loadRemoteData();
       }, sosConfig.updateInterval);
     }
 
