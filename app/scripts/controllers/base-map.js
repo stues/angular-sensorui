@@ -4,7 +4,7 @@
  * @ngdoc function
  * @name BaseMapController
  * @description
- * # BaesMapController
+ * # BaseMapController
  * This Controller contains base functions for a Map Controller
  */
 angular.module('angularol3jsuiApp')
@@ -211,7 +211,7 @@ angular.module('angularol3jsuiApp')
      */
     $scope.applyRemoteData = function (features) {
       $.extend(true, $scope.features, features);
-      for (var featureId in features) {
+      for (var featureId in $scope.features) {
         if ($scope.features.hasOwnProperty(featureId)) {
           $scope.updateRealTimePointFeature($scope.features[featureId]);
         }
