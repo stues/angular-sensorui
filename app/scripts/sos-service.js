@@ -16,36 +16,36 @@ angular.module('angularol3jsuiApp')
   function ($http, $q, $timeout, sosConfig, BaseService) {
     var service = new BaseService();
 
-    var interval = null;
+    var timeout = null;
 
     var latestToDate = null;
 
     /**
-     * Starts the interval to poll the data from the sos server
+     * Starts the timeout to poll the data from the sos server
      */
     service.connect = function () {
-      if (angular.isObject(interval)) {
+      if (service.isConnected()) {
         return;
       }
 
-      // Kick off the interval
-      intervalFunction();
-
-      service.setStatus('Polling for Data');
+      // Kick off the timeout
+      timeoutFunction();
 
       service.setEnableState(true);
+
+      service.setStatus('Polling for Data');
     };
 
     /**
-     * Stops the update interval
+     * Stops the update timeout
      * then informs the subscribers
      */
     service.disconnect = function (message) {
 
-      if (angular.isObject(interval)) {
-        $timeout.cancel(interval);
+      if (angular.isObject(timeout)) {
+        $timeout.cancel(timeout);
         service.resetMessageCount();
-        interval = null;
+        timeout = null;
       }
 
       service.setEnableState(false);
@@ -59,11 +59,11 @@ angular.module('angularol3jsuiApp')
     };
 
     /**
-     * Returns whether the interval for polling is currently active or not
+     * Returns whether the timeout for polling is currently active or not
      * @returns {boolean} true if active
      */
     service.isConnected = function () {
-      return(angular.isObject(interval));
+      return (angular.isObject(timeout));
     };
 
     /**
@@ -81,7 +81,7 @@ angular.module('angularol3jsuiApp')
      * @param dateTo the end date
      * @returns {*} a promise to the results
      */
-    function getNewEntries(dateFrom, dateTo) {
+    function loadNewEntries(dateFrom, dateTo) {
       var request;
       if (sosConfig.requestType === 'application/xml') {
         request = $http({
@@ -135,7 +135,7 @@ angular.module('angularol3jsuiApp')
       else {
         throw 'Unknown Request Type';
       }
-      return (request.then(handleSuccess, handleError));
+      return request.then(handleSuccess, handleError);
     }
 
     /**
@@ -151,11 +151,7 @@ angular.module('angularol3jsuiApp')
       }
       var toDate = new Date();
       latestToDate = toDate;
-      getNewEntries(fromDate, toDate);
-
-      if (angular.isObject(interval)) {
-        intervalFunction();
-      }
+      loadNewEntries(fromDate, toDate);
     }
 
     /**
@@ -188,6 +184,10 @@ angular.module('angularol3jsuiApp')
     function handleSuccess(response) {
       var geoFeatures = convertToFeatures(response);
       service.fireMessages(geoFeatures);
+
+      if (angular.isObject(timeout)) {
+        timeoutFunction();
+      }
     }
 
     /**
@@ -234,8 +234,8 @@ angular.module('angularol3jsuiApp')
      * The function to trigger the remote data loading
      * is delayed by {@link sosConfig.updateInterval}
      */
-    function intervalFunction() {
-      interval = $timeout(function () {
+    function timeoutFunction() {
+      timeout = $timeout(function () {
         loadRemoteData();
       }, sosConfig.updateInterval);
     }
