@@ -141,7 +141,6 @@ angular.module('angularol3jsuiApp')
             jsonObject.properties.messageGenerated = jsonObject.properties.messageReceived;
           }
         }
-        console.log(jsonObject);
         return jsonObject;
       }
     }
