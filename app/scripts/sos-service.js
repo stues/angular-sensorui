@@ -42,7 +42,7 @@ angular.module('angularol3jsuiApp')
      */
     service.disconnect = function (message) {
 
-      if (angular.isObject(timeout)) {
+      if (service.isConnected()) {
         $timeout.cancel(timeout);
         service.resetMessageCount();
         timeout = null;
@@ -135,7 +135,7 @@ angular.module('angularol3jsuiApp')
       else {
         throw 'Unknown Request Type';
       }
-      return request.then(handleSuccess, handleError);
+      request.then(handleSuccess, handleError);
     }
 
     /**
@@ -160,10 +160,6 @@ angular.module('angularol3jsuiApp')
      * @returns {Promise}
      */
     function handleError(response) {
-      if (!angular.isObject(response.data) || !response.data.message) {
-        return ( $q.reject('An unknown error occurred.') );
-      }
-
       var message;
       if (!angular.isObject(response.data) || !response.data.message) {
         message = 'An unknown error occurred.';
@@ -173,7 +169,6 @@ angular.module('angularol3jsuiApp')
       }
 
       service.disconnect(message);
-      return ( $q.reject(message) );
     }
 
     /**

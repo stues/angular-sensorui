@@ -219,6 +219,14 @@ angular.module('angularol3jsuiApp')
     };
 
     /**
+     * Returns the current date
+     * @returns {Date} the current date
+     */
+    $scope.currentDate = function(){
+      return new Date();
+    };
+
+    /**
      * Do subscribe on service to receive current state of the service
      */
     service.subscribeEnableState(function (enabled) {

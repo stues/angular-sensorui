@@ -24,7 +24,7 @@ angular.module('angularol3jsuiApp')
      * or if an error occurred during connecting
      */
     service.connect = function () {
-      if (angular.isObject(websocket)) {
+      if (service.isConnected()) {
         return;
       }
 
@@ -52,7 +52,11 @@ angular.module('angularol3jsuiApp')
      * @param message
      */
     service.disconnect = function (message) {
-      closeConnection();
+      if (service.isConnected()) {
+        websocket.close();
+        service.resetMessageCount();
+        websocket = null;
+      }
       service.setEnableState(false);
 
       var connectionStatusMessage = message;
@@ -125,26 +129,20 @@ angular.module('angularol3jsuiApp')
      * @param jsonObject the jsonObejct to update
      */
     function convertToFeature(jsonObject) {
-      if (jsonObject.properties.hexIdent) {
-        var id = jsonObject.properties.hexIdent;
+      if (jsonObject.properties[websocketConfig.idProperty]) {
+        var id = jsonObject.properties[websocketConfig.idProperty];
         if (id) {
           jsonObject.id = id;
           jsonObject.properties.messageReceived = new Date();
-          jsonObject.properties.messageGenerated = new Date(jsonObject.properties.messageGenerated);
+          if(jsonObject.properties[websocketConfig.messageGeneratedProperty]) {
+            jsonObject.properties.messageGenerated = new Date(jsonObject.properties[websocketConfig.messageGeneratedProperty]);
+          }
+          else{
+            jsonObject.properties.messageGenerated = jsonObject.properties.messageReceived;
+          }
         }
+        console.log(jsonObject);
         return jsonObject;
-      }
-    }
-
-    /**
-     * Closes the connection to the websocket
-     * and deletes the websocket instance
-     */
-    function closeConnection() {
-      if (service.isConnected()) {
-        websocket.close();
-        service.resetMessageCount();
-        websocket = null;
       }
     }
 

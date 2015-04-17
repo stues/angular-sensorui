@@ -61,6 +61,8 @@
   },
   "websocketConfig": {
     "timeDeltaName": "websocketDeltas",
+    "idProperty": "hexIdent",
+    "messageGeneratedProperty": "messageGenerated",
     "url": "ws://192.168.2.4:8443/clientTrackData",
     "cleanupInterval": 15000,
     "areaFilter": {
