@@ -18,14 +18,16 @@ angular.module('angularol3jsuiApp')
     '$controller',
     'SOSJSONService',
     'sosConfig',
+    'mapConfig',
     'olData',
-    function ($scope, $interval, $controller, SOSJSONService, sosConfig, olData) {
+    function ($scope, $interval, $controller, SOSJSONService, sosConfig, mapConfig, olData) {
       $controller('BaseMapController', {
         $scope: $scope,
         $interval: $interval,
         $controller: $controller,
         service: SOSJSONService,
-        config: sosConfig,
+        serviceConfig: sosConfig,
+        mapConfig: mapConfig,
         olData: olData
       });
     }

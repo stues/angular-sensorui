@@ -8,6 +8,8 @@ angular.module('config', [])
 
 .constant('websocketConfig', {timeDeltaName:'websocketDeltas',url:'ws://127.0.0.1:8443/clientTrackData',idProperty:'hexIdent',messageGeneratedProperty:'messageGenerated',cleanupInterval:15000,areaFilter:{type:'Feature',geometry:{type:'Polygon',coordinates:[[[7.315876,47.667385],[7.829487,47.642409],[7.848713,47.383623],[6.630604,47.265401],[7.315876,47.667385]]]},properties:{action:'setAreaFilter'}},clearFilter:{type:'Feature',properties:{action:'clearFilter'}}})
 
+.constant('mapConfig', {olCenter:{lat:46.801111,lon:8.226667,zoom:7},olBackgroundLayer:{source:{type:'OSM'}},olDefaults:{interactions:{mouseWheelZoom:true},controls:{zoom:false,rotate:false,attribution:false}}})
+
 .constant('deltaConfig', {persistInterval:10000})
 
 ;

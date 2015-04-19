@@ -97,7 +97,7 @@ angular.module('angularol3jsuiApp').service('FeatureStyleService', function () {
       styleChanged = true;
     }
 
-    //Update style if text or icon style changed
+    //Update style only if text or icon style changed
     if (styleChanged) {
       feature.setStyle(
         new ol.style.Style({

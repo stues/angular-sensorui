@@ -18,14 +18,16 @@ angular.module('angularol3jsuiApp')
     '$controller',
     'WebsocketGeoJSONService',
     'websocketConfig',
+    'mapConfig',
     'olData',
-    function ($scope, $interval, $controller, WebsocketGeoJSONService, websocketConfig, olData) {
+    function ($scope, $interval, $controller, WebsocketGeoJSONService, websocketConfig, mapConfig, olData) {
       $controller('BaseMapController', {
         $scope: $scope,
         $interval: $interval,
         $controller: $controller,
         service: WebsocketGeoJSONService,
-        config: websocketConfig,
+        serviceConfig: websocketConfig,
+        mapConfig: mapConfig,
         olData: olData
       });
     }

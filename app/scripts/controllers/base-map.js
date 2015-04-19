@@ -10,7 +10,13 @@
 angular.module('angularol3jsuiApp')
   .controller(
   'BaseMapController',
-  function ($scope, $interval, $controller, service, config, olData, FeatureStyleService) {
+  function ($scope, $interval, $controller, service, serviceConfig, mapConfig, olData, FeatureStyleService) {
+
+    angular.extend($scope, {
+      olCenter: mapConfig.olCenter,
+      olBackgroundLayer: mapConfig.olBackgroundLayer,
+      olDefaults: mapConfig.olDefaults
+    });
 
     $scope.features = {};
 
@@ -22,19 +28,19 @@ angular.module('angularol3jsuiApp')
 
     $scope.initialized = false;
 
-    $scope.geoJSONFormat = new ol.format.GeoJSON({defaultDataProjection: 'EPSG:4326'});
+    var geoJSONFormat = new ol.format.GeoJSON(mapConfig.olGeoJSONFormatOptions);
 
-    $scope.vectorSource = new ol.source.Vector({projection: 'EPSG:3857'});
+    var featureSource = new ol.source.Vector(mapConfig.olFeatureSourceOptions);
 
-    $scope.vectorLayer = new ol.layer.Vector({
+    var featureLayer = new ol.layer.Vector({
       title: 'Tracks',
-      source: $scope.vectorSource
+      source: featureSource
     });
 
-    $scope.filterAreaSource = new ol.source.Vector({projection: 'EPSG:3857'});
-    $scope.filterAreaLayer = new ol.layer.Vector({
+    var filterAreaSource = new ol.source.Vector({projection: 'EPSG:3857'});
+    var filterAreaLayer = new ol.layer.Vector({
       title: 'Filter Area',
-      source: $scope.filterAreaSource,
+      source: filterAreaSource,
       style: [new ol.style.Style({
         stroke: new ol.style.Stroke({
           color: 'red',
@@ -47,43 +53,20 @@ angular.module('angularol3jsuiApp')
       })]
     });
 
-    angular.extend($scope, {
-      switzerland: {
-        lat: 46.801111,
-        lon: 8.226667,
-        zoom: 7
-      },
-      backgroundLayer: {
-        source: {
-          type: 'OSM'
-        }
-      },
-      defaults: {
-        interactions: {
-          mouseWheelZoom: true
-        },
-        controls: {
-          zoom: false,
-          rotate: false,
-          attribution: false
-        }
-      }
-    });
+    var timeDeltaModel = $scope.$new();
+    timeDeltaModel.deltaName = serviceConfig.timeDeltaName;
 
-    $scope.timeDeltaModel = $scope.$new();
-    $scope.timeDeltaModel.deltaName = config.timeDeltaName;
-
-    $controller('TimeDeltaCtrl', {$scope: $scope.timeDeltaModel});
+    $controller('TimeDeltaCtrl', {$scope: timeDeltaModel});
 
     /**
      * Initializes the map
-     * adds the filterAreaLayer and the vectorLayer
+     * adds the filterAreaLayer and the featureLayer
      */
-    $scope.init = function () {
+    function init() {
       if (!$scope.initialized) {
         olData.getMap().then(function (map) {
-          map.addLayer($scope.filterAreaLayer);
-          map.addLayer($scope.vectorLayer);
+          map.addLayer(filterAreaLayer);
+          map.addLayer(featureLayer);
         });
       }
       $scope.initialized = true;
@@ -99,7 +82,7 @@ angular.module('angularol3jsuiApp')
           if (!$scope.$$phase) {
             $scope.$apply();
           }
-        }, config.cleanupInterval);
+        }, serviceConfig.cleanupInterval);
       }
     };
 
@@ -125,7 +108,7 @@ angular.module('angularol3jsuiApp')
      */
     $scope.removeOldFeatures = function () {
       var currentMillis = new Date();
-      var currentSeconds = currentMillis - config.cleanupInterval;
+      var currentSeconds = currentMillis - serviceConfig.cleanupInterval;
       var i = 0;
       for (var id in $scope.features) {
         if ($scope.features.hasOwnProperty(id)) {
@@ -134,9 +117,9 @@ angular.module('angularol3jsuiApp')
           var featureSeenDate = feature.properties.messageReceived;
           if (currentSeconds > featureSeenDate) {
             delete $scope.features[id];
-            var featureToRemove = $scope.vectorSource.getFeatureById(id);
+            var featureToRemove = featureSource.getFeatureById(id);
             if (featureToRemove) {
-              $scope.vectorSource.removeFeature(featureToRemove);
+              featureSource.removeFeature(featureToRemove);
             }
           }
         }
@@ -153,12 +136,12 @@ angular.module('angularol3jsuiApp')
 
       if (id) {
         if (object.geometry) {
-          var geoJsonFeature = $scope.geoJSONFormat.readFeature(object, {featureProjection: 'EPSG:3857'});
-          var currentFeature = $scope.vectorSource.getFeatureById(id);
+          var geoJsonFeature = geoJSONFormat.readFeature(object, {featureProjection: 'EPSG:3857'});
+          var currentFeature = featureSource.getFeatureById(id);
           if (!currentFeature) {
             currentFeature = geoJsonFeature;
             currentFeature.setStyle(FeatureStyleService.getStyle(currentFeature));
-            $scope.vectorSource.addFeature(currentFeature);
+            featureSource.addFeature(currentFeature);
           }
           else {
             currentFeature.setProperties(object.properties);
@@ -167,7 +150,7 @@ angular.module('angularol3jsuiApp')
           currentFeature.setGeometry(geoJsonFeature.getGeometry());
         }
 
-        $scope.timeDeltaModel.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
+        timeDeltaModel.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
       }
     };
 
@@ -175,20 +158,20 @@ angular.module('angularol3jsuiApp')
      * Toggles between Filtering Area and no filter
      */
     $scope.toggleFilterArea = function () {
-      $scope.init();
+      init();
       var area;
       if (!$scope.filterArea) {
-        area = config.areaFilter;
-        var geoJsonFeature = $scope.geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
+        area = serviceConfig.areaFilter;
+        var geoJsonFeature = geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
         geoJsonFeature.setId('filterArea');
-        $scope.filterAreaSource.addFeature(geoJsonFeature);
+        filterAreaSource.addFeature(geoJsonFeature);
         $scope.filterArea = true;
       }
       else {
         area = undefined;
-        var featureToRemove = $scope.filterAreaSource.getFeatureById('filterArea');
+        var featureToRemove = filterAreaSource.getFeatureById('filterArea');
         if (featureToRemove) {
-          $scope.filterAreaSource.removeFeature(featureToRemove);
+          filterAreaSource.removeFeature(featureToRemove);
         }
         $scope.filterArea = false;
       }
@@ -231,14 +214,12 @@ angular.module('angularol3jsuiApp')
      */
     service.subscribeEnableState(function (enabled) {
       if (enabled) {
-        $scope.init();
+        init();
         $scope.startCleanupInterval();
       }
       else {
         $scope.stopCleanupInterval();
       }
     });
-
-
   });
 

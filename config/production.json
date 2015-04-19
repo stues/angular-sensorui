@@ -107,5 +107,36 @@
   },
   "deltaConfig": {
     "persistInterval": 60000
+  },
+  "mapConfig": {
+    "olCenter": {
+      "lat": 46.801111,
+      "lon": 8.226667,
+      "zoom": 7
+    },
+    "olBackgroundLayer": {
+      "source": {
+        "type": "OSM"
+      }
+    },
+    "olDefaults": {
+      "interactions": {
+        "mouseWheelZoom": true
+      },
+      "controls": {
+        "zoom": false,
+        "rotate": false,
+        "attribution": false
+      }
+    },
+    "olGeoJSONFormatOptions":{
+      "defaultDataProjection": "EPSG:4326"
+    },
+    "olFeatureSourceOptions":{
+      "projection": "EPSG:4326"
+    }
+  },
+  "deltaConfig": {
+    "persistInterval": 60000
   }
 }
