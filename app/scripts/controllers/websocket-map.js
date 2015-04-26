@@ -26,7 +26,7 @@ angular.module('angularol3jsuiApp')
         $interval: $interval,
         $controller: $controller,
         service: WebsocketGeoJSONService,
-        serviceConfig: websocketConfig,
+        implementationConfig: websocketConfig,
         mapConfig: mapConfig,
         olData: olData
       });

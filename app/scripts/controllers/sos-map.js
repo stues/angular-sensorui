@@ -26,7 +26,7 @@ angular.module('angularol3jsuiApp')
         $interval: $interval,
         $controller: $controller,
         service: SOSJSONService,
-        serviceConfig: sosConfig,
+        implementationConfig: sosConfig,
         mapConfig: mapConfig,
         olData: olData
       });

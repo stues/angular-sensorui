@@ -10,7 +10,7 @@
 angular.module('angularol3jsuiApp')
   .controller(
   'BaseMapController',
-  function ($scope, $interval, $controller, service, serviceConfig, mapConfig, olData, FeatureStyleService) {
+  function ($scope, $interval, $controller, service, implementationConfig, mapConfig, olData, FeatureStyleService) {
 
     angular.extend($scope, {
       olCenter: mapConfig.olCenter,
@@ -28,12 +28,16 @@ angular.module('angularol3jsuiApp')
 
     $scope.initialized = false;
 
-    var geoJSONFormat = new ol.format.GeoJSON(mapConfig.olGeoJSONFormatOptions);
+    var geoJSONFormat = new ol.format.GeoJSON({
+      defaultDataProjection: implementationConfig.featureProjection
+    });
 
-    var featureSource = new ol.source.Vector(mapConfig.olFeatureSourceOptions);
+    var featureSource = new ol.source.Vector({
+      projection: implementationConfig.featureProjection
+    });
 
     var featureLayer = new ol.layer.Vector({
-      title: 'Tracks',
+      title: implementationConfig.featureLayerName,
       source: featureSource
     });
 
@@ -54,7 +58,7 @@ angular.module('angularol3jsuiApp')
     });
 
     var timeDeltaModel = $scope.$new();
-    timeDeltaModel.deltaName = serviceConfig.timeDeltaName;
+    timeDeltaModel.deltaName = implementationConfig.timeDeltaName;
 
     $controller('TimeDeltaCtrl', {$scope: timeDeltaModel});
 
@@ -62,7 +66,7 @@ angular.module('angularol3jsuiApp')
      * Initializes the map
      * adds the filterAreaLayer and the featureLayer
      */
-    function init() {
+    function initFeatureLayers() {
       if (!$scope.initialized) {
         olData.getMap().then(function (map) {
           map.addLayer(filterAreaLayer);
@@ -82,7 +86,7 @@ angular.module('angularol3jsuiApp')
           if (!$scope.$$phase) {
             $scope.$apply();
           }
-        }, serviceConfig.cleanupInterval);
+        }, implementationConfig.cleanupInterval);
       }
     };
 
@@ -108,7 +112,7 @@ angular.module('angularol3jsuiApp')
      */
     $scope.removeOldFeatures = function () {
       var currentMillis = new Date();
-      var currentSeconds = currentMillis - serviceConfig.cleanupInterval;
+      var currentSeconds = currentMillis - implementationConfig.cleanupInterval;
       var i = 0;
       for (var id in $scope.features) {
         if ($scope.features.hasOwnProperty(id)) {
@@ -158,10 +162,10 @@ angular.module('angularol3jsuiApp')
      * Toggles between Filtering Area and no filter
      */
     $scope.toggleFilterArea = function () {
-      init();
+      initFeatureLayers();
       var area;
       if (!$scope.filterArea) {
-        area = serviceConfig.areaFilter;
+        area = implementationConfig.areaFilter;
         var geoJsonFeature = geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
         geoJsonFeature.setId('filterArea');
         filterAreaSource.addFeature(geoJsonFeature);
@@ -177,16 +181,6 @@ angular.module('angularol3jsuiApp')
       }
       service.setFilterArea(area);
     };
-
-    /**
-     * Do Subscribe on service to receive messages
-     */
-    service.subscribeMessages(function (message) {
-      $scope.applyRemoteData(message);
-      if (!$scope.$$phase) {
-        $scope.$apply();
-      }
-    });
 
     /**
      * Update the $scope.features with given data
@@ -205,16 +199,26 @@ angular.module('angularol3jsuiApp')
      * Returns the current date
      * @returns {Date} the current date
      */
-    $scope.currentDate = function(){
+    $scope.currentDate = function () {
       return new Date();
     };
+
+    /**
+     * Do Subscribe on service to receive messages
+     */
+    service.subscribeMessages(function (message) {
+      $scope.applyRemoteData(message);
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
+    });
 
     /**
      * Do subscribe on service to receive current state of the service
      */
     service.subscribeEnableState(function (enabled) {
       if (enabled) {
-        init();
+        initFeatureLayers();
         $scope.startCleanupInterval();
       }
       else {

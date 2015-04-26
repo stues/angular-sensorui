@@ -24,7 +24,7 @@
         <td>Position Lon</td>
         <td>Last Seen</td>
       </tr>
-      <tbody ng-repeat="feature in features">
+      <tbody ng-repeat="feature in features" ng-if="showTable">
       <tr class="{{feature.type}}">
         <td>{{feature.id}}</td>
         <td>{{feature.properties.callsign}}</td>
