@@ -18,30 +18,32 @@ angular.module('angularol3jsuiApp')
       olDefaults: mapConfig.olDefaults
     });
 
-    $scope.features = {};
-
     $scope.showTable = false;
 
     $scope.filterArea = false;
 
     $scope.cleanupInterval = undefined;
 
+    $scope.lastSeenUpdate = undefined;
+
     $scope.initialized = false;
 
+    $scope.featureValues = {};
+
     var geoJSONFormat = new ol.format.GeoJSON({
-      defaultDataProjection: implementationConfig.featureProjection
+      defaultDataProjection: implementationConfig.dataProjection
     });
 
-    var featureSource = new ol.source.Vector({
-      projection: implementationConfig.featureProjection
+    $scope.featureSource = new ol.source.Vector({
+      projection: mapConfig.mapProjection
     });
 
     var featureLayer = new ol.layer.Vector({
       title: implementationConfig.featureLayerName,
-      source: featureSource
+      source: $scope.featureSource
     });
 
-    var filterAreaSource = new ol.source.Vector({projection: 'EPSG:3857'});
+    var filterAreaSource = new ol.source.Vector({projection: mapConfig.mapProjection});
     var filterAreaLayer = new ol.layer.Vector({
       title: 'Filter Area',
       source: filterAreaSource,
@@ -56,6 +58,11 @@ angular.module('angularol3jsuiApp')
         })
       })]
     });
+
+    var featureAttributes = {
+      dataProjection: implementationConfig.dataProjection,
+      featureProjection: mapConfig.mapProjection
+    };
 
     var timeDeltaModel = $scope.$new();
     timeDeltaModel.deltaName = implementationConfig.timeDeltaName;
@@ -74,156 +81,261 @@ angular.module('angularol3jsuiApp')
         });
       }
       $scope.initialized = true;
-    };
+    }
 
     /**
-     * Starts the cleanup interval
+     * The index of the last Seen property
+     * @returns {number|*|i}
      */
-    $scope.startCleanupInterval = function () {
-      if (!angular.isDefined($scope.cleanupInterval)) {
-        $scope.cleanupInterval = $interval(function () {
-          $scope.removeOldFeatures();
-          if (!$scope.$$phase) {
-            $scope.$apply();
-          }
-        }, implementationConfig.cleanupInterval);
-      }
-    };
-
-    /**
-     * Stops the cleanup interval
-     */
-    $scope.stopCleanupInterval = function () {
-      if (angular.isDefined($scope.cleanupInterval)) {
-        $interval.cancel($scope.cleanupInterval);
-        $scope.cleanupInterval = undefined;
-      }
-    };
-
-    /**
-     * Cleanup interval on destroy
-     */
-    $scope.$on('$destroy', function () {
-      $scope.stopCleanupInterval();
-    });
-
-    /**
-     * Removes all features which are older than a given range
-     */
-    $scope.removeOldFeatures = function () {
-      var currentMillis = new Date();
-      var currentSeconds = currentMillis - implementationConfig.cleanupInterval;
-      var i = 0;
-      for (var id in $scope.features) {
-        if ($scope.features.hasOwnProperty(id)) {
-          i++;
-          var feature = $scope.features[id];
-          var featureSeenDate = feature.properties.messageReceived;
-          if (currentSeconds > featureSeenDate) {
-            delete $scope.features[id];
-            var featureToRemove = featureSource.getFeatureById(id);
-            if (featureToRemove) {
-              featureSource.removeFeature(featureToRemove);
-            }
+    function getLastSeenIndex() {
+      if (!angular.isDefined($scope.lastSeenIndex)) {
+        var displayProperties = mapConfig.displayProperties;
+        var displayPropertiesLength = displayProperties.length;
+        for (var i = 0; i < displayPropertiesLength; i++) {
+          if (displayProperties[i].property === 'lastSeen') {
+            $scope.lastSeenIndex = i;
+            break;
           }
         }
       }
-      console.log('Amount of Features:', i);
-    };
+      return $scope.lastSeenIndex;
+    }
 
     /**
-     * Updates the given object within the map. If it does not exist already, it will be added to the map
-     * @param object the object to be added to the map
+     * Returns the Labels for the configured Attributes
+     * @returns {Array}
      */
-    $scope.updateRealTimePointFeature = function (object) {
-      var id = object.id;
-
-      if (id) {
-        if (object.geometry) {
-          var geoJsonFeature = geoJSONFormat.readFeature(object, {featureProjection: 'EPSG:3857'});
-          var currentFeature = featureSource.getFeatureById(id);
-          if (!currentFeature) {
-            currentFeature = geoJsonFeature;
-            currentFeature.setStyle(FeatureStyleService.getStyle(currentFeature));
-            featureSource.addFeature(currentFeature);
-          }
-          else {
-            currentFeature.setProperties(object.properties);
-            FeatureStyleService.updateStyle(currentFeature);
-          }
-          currentFeature.setGeometry(geoJsonFeature.getGeometry());
-        }
-
-        timeDeltaModel.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
+    $scope.getFeaturePropertyLabels = function () {
+      var labels = [];
+      var displayProperties = mapConfig.displayProperties;
+      var displayPropertiesLength = displayProperties.length;
+      for (var i = 0; i < displayPropertiesLength; i++) {
+        labels.push(displayProperties[i].label);
       }
+      return labels;
     };
 
     /**
-     * Toggles between Filtering Area and no filter
+     * Updates the $scope.featureValues for the given feature
+     * @param feature the feature
      */
-    $scope.toggleFilterArea = function () {
-      initFeatureLayers();
-      var area;
-      if (!$scope.filterArea) {
-        area = implementationConfig.areaFilter;
-        var geoJsonFeature = geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
-        geoJsonFeature.setId('filterArea');
-        filterAreaSource.addFeature(geoJsonFeature);
-        $scope.filterArea = true;
+    $scope.updateFeatureDisplayProperties = function (feature, geometry) {
+      var id = feature.getId();
+      var featureValues;
+      if ($scope.featureValues[id]) {
+        featureValues = $scope.featureValues[id];
       }
       else {
-        area = undefined;
-        var featureToRemove = filterAreaSource.getFeatureById('filterArea');
-        if (featureToRemove) {
-          filterAreaSource.removeFeature(featureToRemove);
-        }
-        $scope.filterArea = false;
+        featureValues = [];
+        $scope.featureValues[id] = featureValues;
       }
-      service.setFilterArea(area);
-    };
 
-    /**
-     * Update the $scope.features with given data
-     * @param features the new values
-     */
-    $scope.applyRemoteData = function (features) {
-      $.extend(true, $scope.features, features);
-      for (var featureId in $scope.features) {
-        if ($scope.features.hasOwnProperty(featureId)) {
-          $scope.updateRealTimePointFeature($scope.features[featureId]);
+      if (feature) {
+        var properties = feature.getProperties();
+        var displayProperties = mapConfig.displayProperties;
+        var displayPropertiesLength = displayProperties.length;
+        var valueToAdd;
+        for (var i = 0; i < displayPropertiesLength; i++) {
+          valueToAdd = undefined;
+          var displayProperty = displayProperties[i].property;
+          if (displayProperty === 'id') {
+            valueToAdd = feature.getId();
+          }
+          else if (displayProperty === 'pointLat') {
+            if (geometry) {
+              valueToAdd = Math.round(geometry.coordinates[1]*100)/100;
+            }
+          }
+          else if (displayProperty === 'pointLon') {
+            if (geometry) {
+              valueToAdd = Math.round(geometry.coordinates[0]*100)/100;
+            }
+          }
+          else if (properties[displayProperty]) {
+            valueToAdd = properties[displayProperty];
+          }
+
+          if (valueToAdd) {
+            featureValues[i] = valueToAdd;
+          }
+          else if(!featureValues[i]){
+            featureValues[i] = '';
+          }
         }
       }
     };
 
-    /**
-     * Returns the current date
-     * @returns {Date} the current date
-     */
-    $scope.currentDate = function () {
-      return new Date();
-    };
+      /**
+       * Starts the cleanup interval
+       */
+      $scope.startCleanupInterval = function () {
+        if (!angular.isDefined($scope.cleanupInterval)) {
+          $scope.cleanupInterval = $interval(function () {
+            $scope.removeOldFeatures();
+          }, implementationConfig.cleanupInterval);
+        }
 
-    /**
-     * Do Subscribe on service to receive messages
-     */
-    service.subscribeMessages(function (message) {
-      $scope.applyRemoteData(message);
+        if (!angular.isDefined($scope.lastSeenUpdate)) {
+          $scope.lastSeenUpdate = $interval(function () {
+            $scope.updateLastSeen()
+          }, mapConfig.lastSeenUpdateInterval);
+        }
+      };
+
+    $scope.updateLastSeen = function(){
+      $scope.featureSource.forEachFeature(function (feature) {
+        var id = feature.getId();
+        if ($scope.featureValues[id]) {
+          var featureValues = $scope.featureValues[id];
+
+          var deltaInSeconds = (new Date() - (feature.getProperties().messageReceived - 1))/ 1000;
+          featureValues[getLastSeenIndex()] = Math.round(deltaInSeconds) + 's';
+        }
+      });
       if (!$scope.$$phase) {
         $scope.$apply();
       }
-    });
+    }
 
-    /**
-     * Do subscribe on service to receive current state of the service
-     */
-    service.subscribeEnableState(function (enabled) {
-      if (enabled) {
-        initFeatureLayers();
-        $scope.startCleanupInterval();
-      }
-      else {
+      /**
+       * Stops the cleanup interval
+       */
+      $scope.stopCleanupInterval = function () {
+        if (angular.isDefined($scope.cleanupInterval)) {
+          $interval.cancel($scope.cleanupInterval);
+          $scope.cleanupInterval = undefined;
+        }
+
+        if (angular.isDefined($scope.lastSeenUpdate)) {
+          $interval.cancel($scope.lastSeenUpdate);
+          $scope.lastSeenUpdate = undefined;
+        }
+      };
+
+      /**
+       * Cleanup interval on destroy
+       */
+      $scope.$on('$destroy', function () {
         $scope.stopCleanupInterval();
-      }
-    });
-  });
+      });
+
+      /**
+       * Removes all features which are older than a given range
+       */
+      $scope.removeOldFeatures = function () {
+        var currentMillis = new Date();
+        var currentSeconds = currentMillis - implementationConfig.cleanupInterval;
+        $scope.featureSource.forEachFeature(function (feature) {
+          var featureSeenDate = feature.getProperties().messageReceived;
+          if (currentSeconds > featureSeenDate) {
+            $scope.featureSource.removeFeature(feature);
+            delete $scope.featureValues[feature.getId()];
+          }
+        });
+      };
+
+      /**
+       * Updates the given object within the map. If it does not exist already, it will be added to the map
+       * @param object the object to be added to the map
+       */
+      $scope.updateRealTimePointFeature = function (object) {
+        var id = object.id;
+
+        if (id) {
+          var currentFeature = $scope.featureSource.getFeatureById(id);
+          if (!currentFeature) {
+            if (object.geometry) {
+              var geoJsonFeature = geoJSONFormat.readFeature(object, featureAttributes);
+              currentFeature = geoJsonFeature;
+            }
+            else {
+              currentFeature = new ol.Feature();
+              currentFeature.setId(id);
+              currentFeature.setProperties(object.properties);
+            }
+            currentFeature.setStyle(FeatureStyleService.getStyle(currentFeature));
+            $scope.featureSource.addFeature(currentFeature);
+          }
+          else {
+            var properties = currentFeature.getProperties();
+            $.extend(true, properties, object.properties);
+            currentFeature.setProperties(properties);
+            if (object.geometry) {
+              var geometry = geoJSONFormat.readGeometry(object.geometry, featureAttributes);
+              currentFeature.setGeometry(geometry);
+            }
+            FeatureStyleService.updateStyle(currentFeature);
+          }
+
+          $scope.updateFeatureDisplayProperties(currentFeature, object.geometry);
+          timeDeltaModel.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
+        }
+      };
+
+      /**
+       * Toggles between Filtering Area and no filter
+       */
+      $scope.toggleFilterArea = function () {
+        initFeatureLayers();
+        var area;
+        if (!$scope.filterArea) {
+          area = implementationConfig.areaFilter;
+          var geoJsonFeature = geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
+          geoJsonFeature.setId('filterArea');
+          filterAreaSource.addFeature(geoJsonFeature);
+          $scope.filterArea = true;
+        }
+        else {
+          area = undefined;
+          var featureToRemove = filterAreaSource.getFeatureById('filterArea');
+          if (featureToRemove) {
+            filterAreaSource.removeFeature(featureToRemove);
+          }
+          $scope.filterArea = false;
+        }
+        service.setFilterArea(area);
+      };
+
+      /**
+       * Update the $scope.featureSource with given data
+       * @param features the new values
+       */
+      $scope.applyRemoteData = function (features) {
+        for (var featureId in features) {
+          if (features.hasOwnProperty(featureId)) {
+            $scope.updateRealTimePointFeature(features[featureId]);
+          }
+        }
+      };
+
+      /**
+       * Returns the current date
+       * @returns {Date} the current date
+       */
+      $scope.currentDate = function () {
+        return new Date();
+      };
+
+      /**
+       * Do Subscribe on service to receive messages
+       */
+      service.subscribeMessages(function (message) {
+        $scope.applyRemoteData(message);
+      });
+
+      /**
+       * Do subscribe on service to receive current state of the service
+       */
+      service.subscribeEnableState(function (enabled) {
+        if (enabled) {
+          initFeatureLayers();
+          $scope.startCleanupInterval();
+        }
+        else {
+          $scope.stopCleanupInterval();
+        }
+      });
+    }
+    )
+    ;
 

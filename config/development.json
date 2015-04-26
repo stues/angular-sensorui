@@ -1,51 +1,10 @@
 {
-  "ENV": "development",
+  "ENV": "production",
   "sosConfig": {
-    "timeDeltaName": "sosDeltas",
     "requestType": "application/xml",
     "jsonURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/json",
     "poxURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/pox",
-    "cleanupInterval": 15000,
-    "updateInterval": 3000,
-    "areaFilter": {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              7.315876,
-              47.667385
-            ],
-            [
-              7.829487,
-              47.642409
-            ],
-            [
-              7.848713,
-              47.383623
-            ],
-            [
-              6.630604,
-              47.265401
-            ],
-            [
-              7.315876,
-              47.667385
-            ]
-          ]
-        ]
-      },
-      "properties": {
-        "action": "setAreaFilter"
-      }
-    },
-    "clearFilter": {
-      "type": "Feature",
-      "properties": {
-        "action": "clearFilter"
-      }
-    },
+    "updateInterval": 2000,
     "procedure": "http://stue.ch/sensorobservation/procedure/flighttracking",
     "offering": "http://stue.ch/sensorobservation/offering/ads-b",
     "properties": {
@@ -69,14 +28,46 @@
         "type": "number",
         "name": "groundSpeed"
       }
-    }
+    },
+    "cleanupInterval": 15000,
+    "featureLayerName": "SOS Tracks",
+    "dataProjection": "EPSG:4326",
+    "areaFilter": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            7.315876,
+            47.667385
+          ],
+          [
+            7.829487,
+            47.642409
+          ],
+          [
+            7.848713,
+            47.383623
+          ],
+          [
+            6.630604,
+            47.265401
+          ],
+          [
+            7.315876,
+            47.667385
+          ]
+        ]
+      ]
+    },
+    "timeDeltaName": "sosDeltas"
   },
   "websocketConfig": {
-    "timeDeltaName": "websocketDeltas",
-    "url": "ws://127.0.0.1:8443/clientTrackData",
     "idProperty": "hexIdent",
     "messageGeneratedProperty": "messageGenerated",
+    "url": "ws://127.0.0.1:8443/clientTrackData",
+    "featureLayerName": "Websocket Tracks",
     "cleanupInterval": 15000,
+    "dataProjection": "EPSG:4326",
     "areaFilter": {
       "type": "Feature",
       "geometry": {
@@ -115,9 +106,11 @@
       "properties": {
         "action": "clearFilter"
       }
-    }
+    },
+    "timeDeltaName": "websocketDeltas"
   },
   "mapConfig": {
+    "mapProjection": "EPSG:3857",
     "olCenter": {
       "lat": 46.801111,
       "lon": 8.226667,
@@ -138,14 +131,43 @@
         "attribution": false
       }
     },
-    "olGeoJSONFormatOptions":{
-      "defaultDataProjection": "EPSG:4326"
-    },
-    "olFeatureSourceOptions":{
-      "projection": "EPSG:4326"
-    }
+    "lastSeenUpdateInterval": 500,
+    "displayProperties": [
+      {
+        "property": "id",
+        "label": "Mode S"
+      },
+      {
+        "property": "callsign",
+        "label": "Call Sign"
+      },
+      {
+        "property": "altitude",
+        "label": "Altitude (ft)"
+      },
+      {
+        "property": "heading",
+        "label": "Heading"
+      },
+      {
+        "property": "groundSpeed",
+        "label": "Speed (kt)"
+      },
+      {
+        "property": "pointLat",
+        "label": "Position Latitude"
+      },
+      {
+        "property": "pointLon",
+        "label": "Position Longitude"
+      },
+      {
+        "property": "lastSeen",
+        "label": "Last Seen"
+      }
+    ]
   },
   "deltaConfig": {
-    "persistInterval": 10000
+    "persistInterval": 60000
   }
 }
