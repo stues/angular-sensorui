@@ -77,7 +77,7 @@ angular.module('angularol3jsuiApp')
         message = area;
       }
       else {
-        message = websocketConfig.clearFilter;
+        message = websocketConfig.filterArea.clearFilter;
       }
       sendMessage(JSON.stringify(message));
     };

@@ -22,9 +22,10 @@ angular.module('angularol3jsuiApp')
 
     $scope.featureValues = {};
 
-    var initialized = false;
+    $scope.filterArea = false;
 
-    var filterArea = false;
+
+    var initialized = false;
 
     var cleanupInterval;
 
@@ -40,36 +41,19 @@ angular.module('angularol3jsuiApp')
       projection: mapConfig.mapProjection
     });
 
-    var featureLayer = new ol.layer.Vector({
-      title: implementationConfig.featureLayerName,
-      source: featureSource
-    });
-
-    var filterAreaSource = new ol.source.Vector({projection: mapConfig.mapProjection});
-    var filterAreaLayer = new ol.layer.Vector({
-      title: 'Filter Area',
-      source: filterAreaSource,
-      style: [new ol.style.Style({
-        stroke: new ol.style.Stroke({
-          color: 'red',
-          lineDash: [4],
-          width: 3
-        }),
-        fill: new ol.style.Fill({
-          color: 'rgba(0, 0, 255, 0.05)'
-        })
-      })]
-    });
-
     var featureAttributes = {
       dataProjection: implementationConfig.dataProjection,
       featureProjection: mapConfig.mapProjection
     };
 
-    var timeDeltaModel = $scope.$new();
-    timeDeltaModel.deltaName = implementationConfig.timeDeltaName;
+    var featureLayer = new ol.layer.Vector({
+      title: implementationConfig.featureLayerName,
+      source: featureSource
+    });
 
-    $controller('TimeDeltaCtrl', {$scope: timeDeltaModel});
+    var timeDeltaController;
+
+    var filterAreaController;
 
     /**
      * Watch the show table attribute, if set, enable update of the table
@@ -92,18 +76,57 @@ angular.module('angularol3jsuiApp')
     });
 
     /**
-     * Initializes the map
-     * adds the filterAreaLayer and the featureLayer
+     * Watch the filterArea attribute, if true initialize filter area controller
+     * and notify controller
      */
-    function initFeatureLayers() {
+    $scope.$watch('filterArea', function (newValue) {
+
+      if (newValue) {
+        initFilterAreaController();
+      }
+      if(filterAreaController){
+        filterAreaController.setFilterArea(newValue);
+      }
+    });
+
+    /**
+     * Initializes the time delta model
+     */
+    function initTimeDeltaModel() {
+      if (!timeDeltaController) {
+        timeDeltaController = $scope.$new();
+        timeDeltaController.deltaName = implementationConfig.timeDeltaName;
+        $controller('TimeDeltaCtrl', {$scope: timeDeltaController});
+      }
+    }
+
+    /**
+     * Initializes the map
+     * adds the featureLayer to the map
+     */
+    function initFeatureLayer() {
       if (!initialized) {
         olData.getMap().then(function (map) {
-          map.addLayer(filterAreaLayer);
           map.addLayer(featureLayer);
         });
       }
       initialized = true;
     }
+
+    /**
+     * Initializes the filter area controller
+     */
+    function initFilterAreaController() {
+      if (!filterAreaController) {
+        filterAreaController = $scope.$new();
+        filterAreaController.service = service;
+        filterAreaController.filterAreaConfig = implementationConfig.filterArea;
+        filterAreaController.geoJSONFormat = geoJSONFormat;
+        $controller('FilterAreaCtrl', {$scope: filterAreaController});
+      }
+    }
+
+
 
     /**
      * Iterates over all features and updates the last seen attribute ond the featureValues to display
@@ -315,32 +338,8 @@ angular.module('angularol3jsuiApp')
         }
 
         updateFeatureDisplayProperties(currentFeature);
-        timeDeltaModel.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
+        timeDeltaController.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
       }
-    };
-
-    /**
-     * Toggles between Filtering Area and no filter
-     */
-    $scope.toggleFilterArea = function () {
-      initFeatureLayers();
-      var area;
-      if (!filterArea) {
-        area = implementationConfig.areaFilter;
-        var geoJsonFeature = geoJSONFormat.readFeature(area, {featureProjection: 'EPSG:3857'});
-        geoJsonFeature.setId('filterArea');
-        filterAreaSource.addFeature(geoJsonFeature);
-        filterArea = true;
-      }
-      else {
-        area = undefined;
-        var featureToRemove = filterAreaSource.getFeatureById('filterArea');
-        if (featureToRemove) {
-          filterAreaSource.removeFeature(featureToRemove);
-        }
-        filterArea = false;
-      }
-      service.setFilterArea(area);
     };
 
     /**
@@ -370,7 +369,8 @@ angular.module('angularol3jsuiApp')
      */
     service.subscribeEnableState(function (enabled) {
       if (enabled) {
-        initFeatureLayers();
+        initTimeDeltaModel();
+        initFeatureLayer();
         $scope.startCleanupInterval();
       }
       else {
