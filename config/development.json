@@ -131,7 +131,7 @@
         "attribution": false
       }
     },
-    "lastSeenUpdateInterval": 500,
+    "tableAttributesInterval": 500,
     "displayProperties": [
       {
         "property": "id",

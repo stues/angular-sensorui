@@ -115,6 +115,9 @@ angular.module('angularol3jsuiApp')
         if ($scope.messageCount > 0) {
           $scope.showCount = $scope.isOnMapPage() && true;
         }
+        if (!$scope.$$phase) {
+          $scope.$apply();
+        }
       };
 
       /**
