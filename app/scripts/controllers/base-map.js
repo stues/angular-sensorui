@@ -29,10 +29,6 @@ angular.module('angularol3jsuiApp')
 
     var cleanupInterval;
 
-    var tableAttributesUpdateInterval;
-
-    var lastSeenIndex;
-
     var geoJSONFormat = new ol.format.GeoJSON({
       defaultDataProjection: implementationConfig.dataProjection
     });
@@ -52,26 +48,19 @@ angular.module('angularol3jsuiApp')
     });
 
     var timeDeltaController;
-
     var filterAreaController;
+    var attributeTableController;
 
     /**
      * Watch the show table attribute, if set, enable update of the table
      */
     $scope.$watch('showTable', function (newValue) {
       if (newValue) {
-        updateAllTableAttributes();
-        if (!angular.isDefined(tableAttributesUpdateInterval)) {
-          tableAttributesUpdateInterval = $interval(function () {
-            updateLastSeenTableAttributes();
-          }, mapConfig.tableAttributesInterval);
-        }
+        initAttributeTableController();
       }
-      else {
-        if (angular.isDefined(tableAttributesUpdateInterval)) {
-          $interval.cancel(tableAttributesUpdateInterval);
-          tableAttributesUpdateInterval = undefined;
-        }
+
+      if(attributeTableController){
+        attributeTableController.setShowTable(newValue);
       }
     });
 
@@ -90,6 +79,19 @@ angular.module('angularol3jsuiApp')
     });
 
     /**
+     * Initializes the filter area controller
+     */
+    function initFilterAreaController() {
+      if (!filterAreaController) {
+        filterAreaController = $scope.$new();
+        filterAreaController.service = service;
+        filterAreaController.filterAreaConfig = implementationConfig.filterArea;
+        filterAreaController.geoJSONFormat = geoJSONFormat;
+        $controller('FilterAreaCtrl', {$scope: filterAreaController});
+      }
+    }
+
+    /**
      * Initializes the time delta model
      */
     function initTimeDeltaModel() {
@@ -97,6 +99,19 @@ angular.module('angularol3jsuiApp')
         timeDeltaController = $scope.$new();
         timeDeltaController.deltaName = implementationConfig.timeDeltaName;
         $controller('TimeDeltaCtrl', {$scope: timeDeltaController});
+      }
+    }
+
+    /**
+     * Initializes the filter area controller
+     */
+    function initAttributeTableController() {
+      if (!attributeTableController) {
+        attributeTableController = $scope.$new();
+        attributeTableController.featureSource = featureSource;
+        attributeTableController.filterAreaConfig = implementationConfig.filterArea;
+        attributeTableController.geoJSONFormat = geoJSONFormat;
+        $controller('AttributeTableCtrl', {$scope: attributeTableController});
       }
     }
 
@@ -114,83 +129,6 @@ angular.module('angularol3jsuiApp')
     }
 
     /**
-     * Initializes the filter area controller
-     */
-    function initFilterAreaController() {
-      if (!filterAreaController) {
-        filterAreaController = $scope.$new();
-        filterAreaController.service = service;
-        filterAreaController.filterAreaConfig = implementationConfig.filterArea;
-        filterAreaController.geoJSONFormat = geoJSONFormat;
-        $controller('FilterAreaCtrl', {$scope: filterAreaController});
-      }
-    }
-
-
-
-    /**
-     * Iterates over all features and updates the last seen attribute ond the featureValues to display
-     * After that initiating rendering
-     */
-    function updateAllTableAttributes() {
-      if ($scope.showTable) {
-        featureSource.forEachFeature(function (feature) {
-          updateFeatureDisplayProperties(feature);
-        });
-        if (!$scope.$$phase) {
-          $scope.$apply();
-        }
-      }
-    }
-
-    /**
-     * The index of the last Seen property
-     * @returns {number|*|i}
-     */
-    function getLastSeenIndex() {
-      if (!angular.isDefined(lastSeenIndex)) {
-        var displayProperties = mapConfig.displayProperties;
-        var displayPropertiesLength = displayProperties.length;
-        for (var i = 0; i < displayPropertiesLength; i++) {
-          if (displayProperties[i].property === 'lastSeen') {
-            lastSeenIndex = i;
-            break;
-          }
-        }
-      }
-      return lastSeenIndex;
-    }
-
-    /**
-     * Iterates over all features and updates the last seen attribute ond the featureValues to display
-     * After that initiating rendering
-     */
-    function updateLastSeenTableAttributes() {
-      if ($scope.showTable) {
-        featureSource.forEachFeature(function (feature) {
-          updateLastSeenOnFeature(feature);
-        });
-        if (!$scope.$$phase) {
-          $scope.$apply();
-        }
-      }
-    }
-
-    /**
-     * Updates the last seen property within the $scope.featureValues
-     * @param feature the feature to update
-     */
-    function updateLastSeenOnFeature(feature) {
-      var id = feature.getId();
-      if ($scope.featureValues[id]) {
-        var featureValues = $scope.featureValues[id];
-
-        var deltaInSeconds = (new Date() - (feature.get('messageReceived') - 1)) / 1000;
-        featureValues[getLastSeenIndex()] = Math.round(deltaInSeconds * 100) / 100 + 's';
-      }
-    }
-
-    /**
      * Update the featureSource with given data
      * @param features the new values
      */
@@ -203,67 +141,16 @@ angular.module('angularol3jsuiApp')
     }
 
     /**
-     * Updates the $scope.featureValues for the given feature
-     * @param feature the feature
-     */
-    function updateFeatureDisplayProperties(feature) {
-      var id = feature.getId();
-      var featureValues;
-      if ($scope.featureValues[id]) {
-        featureValues = $scope.featureValues[id];
-      }
-      else {
-        featureValues = [];
-        $scope.featureValues[id] = featureValues;
-      }
-
-      if (feature) {
-        var properties = feature.getProperties();
-        var displayProperties = mapConfig.displayProperties;
-        var displayPropertiesLength = displayProperties.length;
-        var valueToAdd;
-        for (var i = 0; i < displayPropertiesLength; i++) {
-          valueToAdd = undefined;
-          var displayProperty = displayProperties[i].property;
-          if (displayProperty === 'id') {
-            valueToAdd = feature.getId();
-          }
-          else if (displayProperty === 'pointLat') {
-            if (properties.receivedGeometry) {
-              valueToAdd = Math.round(properties.receivedGeometry.coordinates[1] * 100) / 100;
-            }
-          }
-          else if (displayProperty === 'pointLon') {
-            if (properties.receivedGeometry) {
-              valueToAdd = Math.round(properties.receivedGeometry.coordinates[0] * 100) / 100;
-            }
-          }
-          else if (properties[displayProperty]) {
-            valueToAdd = properties[displayProperty];
-          }
-
-          if (valueToAdd) {
-            featureValues[i] = valueToAdd;
-          }
-          else if (!featureValues[i]) {
-            featureValues[i] = '';
-          }
-        }
-      }
-    }
-
-    /**
      * Returns the Labels for the configured Attributes
      * @returns {Array}
      */
-    $scope.getFeaturePropertyLabels = function () {
-      var labels = [];
-      var displayProperties = mapConfig.displayProperties;
-      var displayPropertiesLength = displayProperties.length;
-      for (var i = 0; i < displayPropertiesLength; i++) {
-        labels.push(displayProperties[i].label);
+    $scope.getTableHeaderLabels = function () {
+      if(attributeTableController) {
+        return attributeTableController.getFeaturePropertyLabels();
       }
-      return labels;
+      else{
+        return [];
+      }
     };
 
     /**
@@ -337,7 +224,9 @@ angular.module('angularol3jsuiApp')
           FeatureStyleService.updateStyle(currentFeature);
         }
 
-        updateFeatureDisplayProperties(currentFeature);
+        if(attributeTableController){
+          attributeTableController.updateFeatureDisplayProperties(currentFeature);
+        }
         timeDeltaController.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
       }
     };

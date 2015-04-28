@@ -14,7 +14,7 @@
   <div ng-show="showTable" class="aircraft-table">
     <table class="table table-striped table-bordered table-condensed table-hover table-condensed sorting">
       <tr class="h4">
-        <td ng-repeat="label in getFeaturePropertyLabels()" ng-if="showTable">{{label}}</td>
+        <td ng-repeat="label in getTableHeaderLabels()" ng-if="showTable">{{label}}</td>
       </tr>
       <tbody ng-repeat="featureValues in featureValues" ng-if="showTable">
       <tr>
