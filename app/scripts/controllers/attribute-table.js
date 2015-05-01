@@ -108,6 +108,10 @@ angular.module('angularol3jsuiApp')
        * After that initiating rendering
        */
       function updateAllTableAttributes() {
+        //Clear the object
+        for (var feature in $scope.featureValues) delete $scope.featureValues[feature];
+
+        //Add all Features
         $scope.$parent.forEachFeature(function (feature) {
           $scope.updateFeatureDisplayProperties(feature);
         });

@@ -104,10 +104,10 @@ angular.module('angularol3jsuiApp')
      */
     $scope.removeOldFeatures = function () {
       var currentMillis = new Date();
-      var currentSeconds = currentMillis - implementationConfig.cleanupInterval;
+      var oldestMoment = currentMillis - implementationConfig.cleanupInterval;
       featureSource.forEachFeature(function (feature) {
         var featureSeenDate = feature.get('messageReceived');
-        if (currentSeconds > featureSeenDate) {
+        if (oldestMoment > featureSeenDate) {
           featureSource.removeFeature(feature);
           $scope.$broadcast('featureRemoved', feature);
         }
@@ -189,8 +189,8 @@ angular.module('angularol3jsuiApp')
     /**
      * Do Subscribe on service to receive messages
      */
-    service.subscribeMessages(function (message) {
-      applyRemoteData(message);
+    service.subscribeMessages(function (features) {
+      applyRemoteData(features);
     });
 
     /**
