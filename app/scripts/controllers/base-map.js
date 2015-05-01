@@ -73,7 +73,7 @@ angular.module('angularol3jsuiApp')
     function applyRemoteData(features) {
       for (var featureId in features) {
         if (features.hasOwnProperty(featureId)) {
-          $scope.updateRealTimePointFeature(features[featureId]);
+          $scope.addOrUpdateFeature(features[featureId]);
         }
       }
     }
@@ -118,45 +118,66 @@ angular.module('angularol3jsuiApp')
      * Applies the given callback to all current features within the featureSource
      * @param callback the callback
      */
-    $scope.forEachFeature = function(callback){
+    $scope.forEachFeature = function (callback) {
       featureSource.forEachFeature(callback);
     };
 
     /**
-     * Updates the given object within the map. If it does not exist already, it will be added to the map
+     * Creates a new ol.Feature object, and fills the object with information provided from the given object
+     * @param object the object
+     * @returns {*} a ol.Feature instance
+     */
+    function createFeature(object) {
+      var currentFeature;
+      if (object.geometry) {
+        var geoJsonFeature = $scope.olGeoJSONFormat.readFeature(object, featureAttributes);
+        geoJsonFeature.set('receivedGeometry', object.geometry);
+        currentFeature = geoJsonFeature;
+      }
+      else {
+        currentFeature = new ol.Feature();
+        currentFeature.setId(object.id);
+        currentFeature.setProperties(object.properties);
+      }
+      currentFeature.setStyle(FeatureStyleService.getStyle(currentFeature));
+      return currentFeature;
+    }
+
+    /**
+     * Updates the given featureSourceFeature with information provided from the given object
+     * @param featureSourceFeature the feature source feature
+     * @param object the object with changed information
+     * @returns {*} a ol.Feature instance
+     */
+    function updateFeature(featureSourceFeature, object) {
+      var properties = featureSourceFeature.getProperties();
+      $.extend(true, properties, object.properties);
+      featureSourceFeature.setProperties(properties);
+      if (object.geometry) {
+        var geometry = $scope.olGeoJSONFormat.readGeometry(object.geometry, featureAttributes);
+        featureSourceFeature.setGeometry(geometry);
+        featureSourceFeature.set('receivedGeometry', object.geometry);
+      }
+      FeatureStyleService.updateStyle(featureSourceFeature);
+      return featureSourceFeature;
+    }
+
+    /**
+     * Adds or Updates the given object within $scope.featureSource. If it does not exist already, it will be added to the map
      * @param object the object to be added to the map
      */
-    $scope.updateRealTimePointFeature = function (object) {
+    $scope.addOrUpdateFeature = function (object) {
       var id = object.id;
 
       if (id) {
-        var currentFeature = featureSource.getFeatureById(id);
-        if (!currentFeature) {
-          if (object.geometry) {
-            var geoJsonFeature = $scope.olGeoJSONFormat.readFeature(object, featureAttributes);
-            geoJsonFeature.set('receivedGeometry', object.geometry);
-            currentFeature = geoJsonFeature;
-          }
-          else {
-            currentFeature = new ol.Feature();
-            currentFeature.setId(id);
-            currentFeature.setProperties(object.properties);
-          }
-          currentFeature.setStyle(FeatureStyleService.getStyle(currentFeature));
-          featureSource.addFeature(currentFeature);
-          $scope.$broadcast('featureAdded', currentFeature);
+        var featureSourceFeature = featureSource.getFeatureById(id);
+        if (featureSourceFeature) {
+          $scope.$broadcast('featureChanged', updateFeature(featureSourceFeature, object));
         }
         else {
-          var properties = currentFeature.getProperties();
-          $.extend(true, properties, object.properties);
-          currentFeature.setProperties(properties);
-          if (object.geometry) {
-            var geometry = $scope.olGeoJSONFormat.readGeometry(object.geometry, featureAttributes);
-            currentFeature.setGeometry(geometry);
-            currentFeature.set('receivedGeometry', object.geometry);
-          }
-          FeatureStyleService.updateStyle(currentFeature);
-          $scope.$broadcast('featureChanged', currentFeature);
+          var createdFeature = createFeature(object);
+          featureSource.addFeature(createdFeature);
+          $scope.$broadcast('featureAdded', createdFeature);
         }
 
         timeDeltaController.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
@@ -167,7 +188,7 @@ angular.module('angularol3jsuiApp')
      * Returns the configured service
      * @returns {service|*}
      */
-    $scope.getService = function(){
+    $scope.getService = function () {
       return service;
     };
 
@@ -175,7 +196,7 @@ angular.module('angularol3jsuiApp')
      * Returns the implementation specific config
      * @returns {implementationConfig|*}
      */
-    $scope.getConfig = function(){
+    $scope.getConfig = function () {
       return implementationConfig;
     };
 
