@@ -20,6 +20,44 @@ angular.module('angularol3jsuiApp')
 
       var lastSeenIndex;
 
+      $scope.featureValues = {};
+
+      $scope.showTable = false;
+
+      /**
+       * Watch the show table attribute, if set, enable update of the table
+       */
+      $scope.$watch('showTable', function (newValue) {
+        $scope.setShowTable(newValue);
+      });
+
+      /**
+       * Is being called whenever a feature has changed, update the properties of the changed feature
+       */
+      $scope.$parent.$on('featureAdded', function(event, addedFeature){
+        if($scope.showTable && addedFeature){
+          $scope.updateFeatureDisplayProperties(addedFeature);
+        }
+      });
+
+      /**
+       * Is being called whenever a feature has changed, update the properties of the changed feature
+       */
+      $scope.$parent.$on('featureChanged', function(event, changedFeature){
+        if($scope.showTable && changedFeature){
+          $scope.updateFeatureDisplayProperties(changedFeature);
+        }
+      });
+
+      /**
+       * Is being called whenever a feature has been removed, remove feature from table
+       */
+      $scope.$parent.$on('featureRemoved', function(event, removedFeature){
+        if(removedFeature) {
+          delete $scope.featureValues[removedFeature.getId()];
+        }
+      });
+
       /**
        * Watch the show table attribute, if set, enable update of the table
        */
@@ -45,7 +83,7 @@ angular.module('angularol3jsuiApp')
        * After that initiating rendering
        */
       function updateAllTableAttributes() {
-        $scope.featureSource.forEachFeature(function (feature) {
+        $scope.$parent.forEachFeature(function (feature) {
           $scope.updateFeatureDisplayProperties(feature);
         });
         if (!$scope.$$phase) {
@@ -76,7 +114,7 @@ angular.module('angularol3jsuiApp')
        * After that initiating rendering
        */
       function updateLastSeenTableAttributes() {
-        $scope.featureSource.forEachFeature(function (feature) {
+        $scope.$parent.forEachFeature(function (feature) {
           updateLastSeenOnFeature(feature);
         });
         if (!$scope.$$phase) {
@@ -160,6 +198,14 @@ angular.module('angularol3jsuiApp')
             }
           }
         }
-      }
+      };
+
+      /**
+       * Returns the current date
+       * @returns {Date} the current date
+       */
+      $scope.currentDate = function () {
+        return new Date();
+      };
 
     }]);

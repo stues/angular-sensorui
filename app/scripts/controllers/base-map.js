@@ -13,34 +13,27 @@ angular.module('angularol3jsuiApp')
   function ($scope, $interval, $controller, service, implementationConfig, mapConfig, olData, FeatureStyleService) {
 
     angular.extend($scope, {
+      //OpenLayers3 specific
       olCenter: mapConfig.olCenter,
       olBackgroundLayer: mapConfig.olBackgroundLayer,
-      olDefaults: mapConfig.olDefaults
+      olDefaults: mapConfig.olDefaults,
+      olGeoJSONFormat: new ol.format.GeoJSON({
+        defaultDataProjection: implementationConfig.dataProjection
+      })
     });
-
-    $scope.showTable = false;
-
-    $scope.featureValues = {};
-
-    $scope.filterArea = false;
-
 
     var initialized = false;
 
     var cleanupInterval;
 
-    var geoJSONFormat = new ol.format.GeoJSON({
-      defaultDataProjection: implementationConfig.dataProjection
-    });
-
-    var featureSource = new ol.source.Vector({
-      projection: mapConfig.mapProjection
-    });
-
     var featureAttributes = {
       dataProjection: implementationConfig.dataProjection,
       featureProjection: mapConfig.mapProjection
     };
+
+    var featureSource = new ol.source.Vector({
+      projection: mapConfig.mapProjection
+    });
 
     var featureLayer = new ol.layer.Vector({
       title: implementationConfig.featureLayerName,
@@ -48,72 +41,6 @@ angular.module('angularol3jsuiApp')
     });
 
     var timeDeltaController;
-    var filterAreaController;
-    var attributeTableController;
-
-    /**
-     * Watch the show table attribute, if set, enable update of the table
-     */
-    $scope.$watch('showTable', function (newValue) {
-      if (newValue) {
-        initAttributeTableController();
-      }
-
-      if(attributeTableController){
-        attributeTableController.setShowTable(newValue);
-      }
-    });
-
-    /**
-     * Watch the filterArea attribute, if true initialize filter area controller
-     * and notify controller
-     */
-    $scope.$watch('filterArea', function (newValue) {
-
-      if (newValue) {
-        initFilterAreaController();
-      }
-      if(filterAreaController){
-        filterAreaController.setFilterArea(newValue);
-      }
-    });
-
-    /**
-     * Initializes the filter area controller
-     */
-    function initFilterAreaController() {
-      if (!filterAreaController) {
-        filterAreaController = $scope.$new();
-        filterAreaController.service = service;
-        filterAreaController.filterAreaConfig = implementationConfig.filterArea;
-        filterAreaController.geoJSONFormat = geoJSONFormat;
-        $controller('FilterAreaCtrl', {$scope: filterAreaController});
-      }
-    }
-
-    /**
-     * Initializes the time delta model
-     */
-    function initTimeDeltaModel() {
-      if (!timeDeltaController) {
-        timeDeltaController = $scope.$new();
-        timeDeltaController.deltaName = implementationConfig.timeDeltaName;
-        $controller('TimeDeltaCtrl', {$scope: timeDeltaController});
-      }
-    }
-
-    /**
-     * Initializes the filter area controller
-     */
-    function initAttributeTableController() {
-      if (!attributeTableController) {
-        attributeTableController = $scope.$new();
-        attributeTableController.featureSource = featureSource;
-        attributeTableController.filterAreaConfig = implementationConfig.filterArea;
-        attributeTableController.geoJSONFormat = geoJSONFormat;
-        $controller('AttributeTableCtrl', {$scope: attributeTableController});
-      }
-    }
 
     /**
      * Initializes the map
@@ -129,6 +56,17 @@ angular.module('angularol3jsuiApp')
     }
 
     /**
+     * Initializes the time delta model
+     */
+    function initTimeDeltaModel() {
+      if (!timeDeltaController) {
+        timeDeltaController = $scope.$new();
+        timeDeltaController.deltaName = implementationConfig.timeDeltaName;
+        $controller('TimeDeltaCtrl', {$scope: timeDeltaController});
+      }
+    }
+
+    /**
      * Update the featureSource with given data
      * @param features the new values
      */
@@ -139,19 +77,6 @@ angular.module('angularol3jsuiApp')
         }
       }
     }
-
-    /**
-     * Returns the Labels for the configured Attributes
-     * @returns {Array}
-     */
-    $scope.getTableHeaderLabels = function () {
-      if(attributeTableController) {
-        return attributeTableController.getFeaturePropertyLabels();
-      }
-      else{
-        return [];
-      }
-    };
 
     /**
      * Starts the cleanup interval
@@ -184,9 +109,17 @@ angular.module('angularol3jsuiApp')
         var featureSeenDate = feature.get('messageReceived');
         if (currentSeconds > featureSeenDate) {
           featureSource.removeFeature(feature);
-          delete $scope.featureValues[feature.getId()];
+          $scope.$broadcast('featureRemoved', feature);
         }
       });
+    };
+
+    /**
+     * Applies the given callback to all current features within the featureSource
+     * @param callback the callback
+     */
+    $scope.forEachFeature = function(callback){
+      featureSource.forEachFeature(callback);
     };
 
     /**
@@ -200,7 +133,7 @@ angular.module('angularol3jsuiApp')
         var currentFeature = featureSource.getFeatureById(id);
         if (!currentFeature) {
           if (object.geometry) {
-            var geoJsonFeature = geoJSONFormat.readFeature(object, featureAttributes);
+            var geoJsonFeature = $scope.olGeoJSONFormat.readFeature(object, featureAttributes);
             geoJsonFeature.set('receivedGeometry', object.geometry);
             currentFeature = geoJsonFeature;
           }
@@ -211,32 +144,39 @@ angular.module('angularol3jsuiApp')
           }
           currentFeature.setStyle(FeatureStyleService.getStyle(currentFeature));
           featureSource.addFeature(currentFeature);
+          $scope.$broadcast('featureAdded', currentFeature);
         }
         else {
           var properties = currentFeature.getProperties();
           $.extend(true, properties, object.properties);
           currentFeature.setProperties(properties);
           if (object.geometry) {
-            var geometry = geoJSONFormat.readGeometry(object.geometry, featureAttributes);
+            var geometry = $scope.olGeoJSONFormat.readGeometry(object.geometry, featureAttributes);
             currentFeature.setGeometry(geometry);
             currentFeature.set('receivedGeometry', object.geometry);
           }
           FeatureStyleService.updateStyle(currentFeature);
+          $scope.$broadcast('featureChanged', currentFeature);
         }
 
-        if(attributeTableController){
-          attributeTableController.updateFeatureDisplayProperties(currentFeature);
-        }
         timeDeltaController.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
       }
     };
 
     /**
-     * Returns the current date
-     * @returns {Date} the current date
+     * Returns the configured service
+     * @returns {service|*}
      */
-    $scope.currentDate = function () {
-      return new Date();
+    $scope.getService = function(){
+      return service;
+    };
+
+    /**
+     * Returns the implementation specific config
+     * @returns {implementationConfig|*}
+     */
+    $scope.getConfig = function(){
+      return implementationConfig;
     };
 
     /**

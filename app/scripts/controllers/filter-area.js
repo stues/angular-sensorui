@@ -15,6 +15,13 @@ angular.module('angularol3jsuiApp')
     'mapConfig',
     'olData',
     function ($scope, mapConfig, olData) {
+
+      var initialized = false;
+
+      $scope.filterArea = false;
+
+      $scope.filterAreaConfig = $scope.$parent.getConfig().filterArea;
+
       var featureAttributes = {
         dataProjection: $scope.filterAreaConfig.dataProjection,
         featureProjection: mapConfig.mapProjection
@@ -37,19 +44,42 @@ angular.module('angularol3jsuiApp')
         })]
       });
 
-      // Add Filter Area Layer to Map
-      olData.getMap().then(function (map) {
-        map.addLayer(filterAreaLayer);
+      /**
+       * Watch the filterArea attribute, if true initialize filter area controller
+       * and notify controller
+       */
+      $scope.$watch('filterArea', function (newValue) {
+        $scope.setFilterArea(newValue);
       });
+
 
       /**
        * Toggles between Filtering Area and no filter
        */
       $scope.setFilterArea = function (enabled) {
+        if (!initialized && enabled) {
+          // Add Filter Area Layer to Map
+          olData.getMap().then(function (map) {
+            map.addLayer(filterAreaLayer);
+            initialized = true;
+            enableFilterArea(enabled);
+          });
+        }
+        else {
+          enableFilterArea(enabled);
+        }
+      };
+
+      /**
+       * Enabled / Disables the filter area dependent on the given attribute
+       * @param enabled true to enabled false to disable
+       */
+      function enableFilterArea(enabled) {
+
         var area;
         if (enabled) {
           area = $scope.filterAreaConfig.areaFilter;
-          var geoJsonFeature = $scope.geoJSONFormat.readFeature(area, featureAttributes);
+          var geoJsonFeature = $scope.$parent.olGeoJSONFormat.readFeature(area, featureAttributes);
           geoJsonFeature.setId('filterArea');
           filterAreaSource.addFeature(geoJsonFeature);
         }
@@ -60,6 +90,6 @@ angular.module('angularol3jsuiApp')
             filterAreaSource.removeFeature(featureToRemove);
           }
         }
-        $scope.service.setFilterArea(area);
-      };
+        $scope.$parent.getService().setFilterArea(area);
+      }
     }]);
