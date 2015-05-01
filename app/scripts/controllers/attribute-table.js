@@ -24,6 +24,10 @@ angular.module('angularol3jsuiApp')
 
       $scope.showTable = false;
 
+      var addedFeatureListener;
+      var updateFeatureListener;
+      var removedFeatureListener;
+
       /**
        * Watch the show table attribute, if set, enable update of the table
        */
@@ -32,37 +36,11 @@ angular.module('angularol3jsuiApp')
       });
 
       /**
-       * Is being called whenever a feature has changed, update the properties of the changed feature
-       */
-      $scope.$parent.$on('featureAdded', function(event, addedFeature){
-        if($scope.showTable && addedFeature){
-          $scope.updateFeatureDisplayProperties(addedFeature);
-        }
-      });
-
-      /**
-       * Is being called whenever a feature has changed, update the properties of the changed feature
-       */
-      $scope.$parent.$on('featureChanged', function(event, changedFeature){
-        if($scope.showTable && changedFeature){
-          $scope.updateFeatureDisplayProperties(changedFeature);
-        }
-      });
-
-      /**
-       * Is being called whenever a feature has been removed, remove feature from table
-       */
-      $scope.$parent.$on('featureRemoved', function(event, removedFeature){
-        if(removedFeature) {
-          delete $scope.featureValues[removedFeature.getId()];
-        }
-      });
-
-      /**
        * Watch the show table attribute, if set, enable update of the table
        */
       $scope.setShowTable = function (newValue) {
         if (newValue) {
+          registerListeners();
           updateAllTableAttributes();
           if (!angular.isDefined(tableAttributesUpdateInterval)) {
             tableAttributesUpdateInterval = $interval(function () {
@@ -71,12 +49,59 @@ angular.module('angularol3jsuiApp')
           }
         }
         else {
+          deregisterListeners();
           if (angular.isDefined(tableAttributesUpdateInterval)) {
             $interval.cancel(tableAttributesUpdateInterval);
             tableAttributesUpdateInterval = undefined;
           }
         }
       };
+
+      /**
+       * Can be called to remove a given feature from the table
+       * @param event the broadcast event
+       * @param removedFeature the removed feature
+       */
+      var removeFeatureCallback = function (event, removedFeature) {
+        if (removedFeature) {
+          delete $scope.featureValues[removedFeature.getId()];
+        }
+      };
+
+      /**
+       * Can be called to add or update a given feature on the table
+       * @param event the broadcast event
+       * @param changedFeature the changed feature
+       */
+      var updateFeatureCallback = function (event, changedFeature) {
+        if ($scope.showTable && changedFeature) {
+          $scope.updateFeatureDisplayProperties(changedFeature);
+        }
+      };
+
+      /**
+       * Register to parent feature broadcast
+       */
+      function registerListeners() {
+        addedFeatureListener = $scope.$parent.$on('featureAdded', updateFeatureCallback);
+        updateFeatureListener = $scope.$parent.$on('featureChanged', updateFeatureCallback);
+        removedFeatureListener = $scope.$parent.$on('featureRemoved', removeFeatureCallback);
+      }
+
+      /**
+       * Deregister from parent feature broadcast
+       */
+      function deregisterListeners() {
+        if (addedFeatureListener) {
+          addedFeatureListener();
+        }
+        if (updateFeatureListener) {
+          updateFeatureListener();
+        }
+        if (removedFeatureListener) {
+          removedFeatureListener();
+        }
+      }
 
       /**
        * Iterates over all features and updates the last seen attribute ond the featureValues to display
@@ -208,4 +233,6 @@ angular.module('angularol3jsuiApp')
         return new Date();
       };
 
-    }]);
+    }
+  ])
+;
