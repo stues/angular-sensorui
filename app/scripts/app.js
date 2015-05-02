@@ -19,7 +19,7 @@ angular
     'openlayers-directive',
     'config'
   ])
-  .config(function ($routeProvider) {
+  .config(function ($routeProvider, appConfig) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
@@ -29,14 +29,6 @@ angular
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
-      .when('/websocket-map', {
-        templateUrl: 'views/map.html',
-        controller: 'WebsocketMapCtrl'
-      })
-      .when('/sos-map', {
-        templateUrl: 'views/map.html',
-        controller: 'SOSMapCtrl'
-      })
       .when('/delta-table', {
         templateUrl: 'views/delta-table.html',
         controller: 'TimeDeltaCtrl'
@@ -44,4 +36,23 @@ angular
       .otherwise({
         redirectTo: '/'
       });
-  });
+
+    if (appConfig.mapPages) {
+      var mapPages = appConfig.mapPages;
+      var mapPagesLength = mapPages.length;
+      for (var i = 0; i < mapPagesLength; i++) {
+        var mapPageConfig = mapPages[i];
+        $routeProvider.when(mapPageConfig.url, {
+          templateUrl: 'views/map.html',
+          controller: 'MapController',
+          resolve: {
+            implementationConfig: mapPageConfig.config,
+            dataService: mapPageConfig.dataService,
+            styleService: mapPageConfig.styleService
+          }
+        });
+      }
+    }
+  }
+)
+;

@@ -38,8 +38,7 @@
   <div class="collapse navbar-collapse" ng-controller="menuController">
 
     <ul class="nav navbar-nav">
-      <li><a ng-href="#/websocket-map">Websocket Map</a></li>
-      <li><a ng-href="#/sos-map">SOS Map</a></li>
+      <li ng-repeat="mapPage in mapPages"><a ng-href="#{{mapPage.url}}">{{mapPage.displayName}}</a></li>
       <li><a ng-href="#/delta-table">Time Deltas</a></li>
     </ul>
 
@@ -112,12 +111,10 @@
 <script src="scripts/base-service.js"></script>
 <script src="scripts/websocket-service.js"></script>
 <script src="scripts/sos-service.js"></script>
-<script src="scripts/feature-style.js"></script>
+<script src="scripts/aircraft-style.js"></script>
 <script src="scripts/controllers/main.js"></script>
 <script src="scripts/controllers/menu.js"></script>
-<script src="scripts/controllers/base-map.js"></script>
-<script src="scripts/controllers/websocket-map.js"></script>
-<script src="scripts/controllers/sos-map.js"></script>
+<script src="scripts/controllers/map.js"></script>
 <script src="scripts/controllers/timedelta.js"></script>
 <script src="scripts/controllers/filter-area.js"></script>
 <script src="scripts/controllers/attribute-table.js"></script>

@@ -2,15 +2,15 @@
 
 /**
  * @ngdoc function
- * @name BaseMapController
+ * @name MapController
  * @description
- * # BaseMapController
- * This Controller contains base functions for a Map Controller
+ * # MapController
+ * This Controller contains functions Map Visualisation of Feature Data
  */
 angular.module('angularol3jsuiApp')
   .controller(
-  'BaseMapController',
-  function ($scope, $interval, $controller, service, implementationConfig, mapConfig, olData, FeatureStyleService) {
+  'MapController',
+  function ($scope, $interval, $controller, dataService, styleService, implementationConfig, mapConfig, olData) {
 
     angular.extend($scope, {
       //OpenLayers3 specific
@@ -48,11 +48,11 @@ angular.module('angularol3jsuiApp')
      */
     function initFeatureLayer() {
       if (!initialized) {
+        initialized = true;
         olData.getMap().then(function (map) {
           map.addLayer(featureLayer);
         });
       }
-      initialized = true;
     }
 
     /**
@@ -139,7 +139,7 @@ angular.module('angularol3jsuiApp')
         currentFeature.setId(object.id);
         currentFeature.setProperties(object.properties);
       }
-      currentFeature.setStyle(FeatureStyleService.getStyle(currentFeature));
+      currentFeature.setStyle(styleService.getStyle(currentFeature));
       return currentFeature;
     }
 
@@ -158,7 +158,7 @@ angular.module('angularol3jsuiApp')
         featureSourceFeature.setGeometry(geometry);
         featureSourceFeature.set('receivedGeometry', object.geometry);
       }
-      FeatureStyleService.updateStyle(featureSourceFeature);
+      styleService.updateStyle(featureSourceFeature);
       return featureSourceFeature;
     }
 
@@ -180,16 +180,18 @@ angular.module('angularol3jsuiApp')
           $scope.$broadcast('featureAdded', createdFeature);
         }
 
-        timeDeltaController.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
+        if(timeDeltaController) {
+          timeDeltaController.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
+        }
       }
     };
 
     /**
-     * Returns the configured service
-     * @returns {service|*}
+     * Returns the configured dataService
+     * @returns {dataService|*}
      */
-    $scope.getService = function () {
-      return service;
+    $scope.getDataService = function () {
+      return dataService;
     };
 
     /**
@@ -208,16 +210,16 @@ angular.module('angularol3jsuiApp')
     });
 
     /**
-     * Do Subscribe on service to receive messages
+     * Do Subscribe on dataService to receive messages
      */
-    service.subscribeMessages(function (features) {
+    dataService.subscribeMessages(function (features) {
       applyRemoteData(features);
     });
 
     /**
-     * Do subscribe on service to receive current state of the service
+     * Do subscribe on dataService to receive current state of the dataService
      */
-    service.subscribeEnableState(function (enabled) {
+    dataService.subscribeEnableState(function (enabled) {
       if (enabled) {
         initTimeDeltaModel();
         initFeatureLayer();

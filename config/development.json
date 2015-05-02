@@ -1,5 +1,25 @@
 {
   "ENV": "production",
+  "appConfig": {
+    "mapPages": [
+      {
+        "id": "websocketMap",
+        "displayName": "Websocket Map",
+        "url": "/websocket-map",
+        "config": "websocketConfig",
+        "dataService": "WebsocketGeoJSONService",
+        "styleService": "AircraftStyleService"
+      },
+      {
+        "id": "sosMap",
+        "displayName": "SOS Map",
+        "url": "/sos-map",
+        "config": "sosConfig",
+        "dataService": "SOSJSONService",
+        "styleService": "AircraftStyleService"
+      }
+    ]
+  },
   "sosConfig": {
     "requestType": "application/xml",
     "jsonURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/json",

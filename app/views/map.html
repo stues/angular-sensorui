@@ -2,6 +2,7 @@
   <openlayers custom-layers="true" ol-defaults="olDefaults" ol-center="olCenter" height="100%">
     <ol-layer ol-layer-properties="olBackgroundLayer"/>
   </openlayers>
+
   <div ng-controller="AttributeTableCtrl">
     <a class="btn pull-left show-table-button"
        ng-class="{true: 'btn-success', false: 'btn-danger'}[!showTable]"
@@ -22,6 +23,7 @@
       </table>
     </div>
   </div>
+
   <div ng-controller="FilterAreaCtrl">
     <a class="btn pull-right filter-table-button btn-warning"
        ng-class="{true: 'btn-danger', false: 'btn-warning'}[filterArea]" ng-click="filterArea = !filterArea">

@@ -13,9 +13,16 @@ angular.module('angularol3jsuiApp')
   [
     '$scope',
     '$location',
+    '$injector',
+    'appConfig',
     'WebsocketGeoJSONService',
     'SOSJSONService',
-    function ($scope, $location, WebsocketGeoJSONService, SOSJSONService) {
+    function ($scope, $location, $injector, appConfig, WebsocketGeoJSONService, SOSJSONService) {
+
+      var serviceURLs = {};
+      var services = {};
+
+      $scope.mapPages = [];
 
       $scope.status = undefined;
 
@@ -30,20 +37,17 @@ angular.module('angularol3jsuiApp')
        * @returns {boolean} true if on Map Page otherwise false
        */
       $scope.isOnMapPage = function () {
-        return angular.isDefined($scope.getMapPage());
+        return angular.isDefined($scope.getMapIdentifier());
       };
 
       /**
        * Return the name of the current map page
        * @returns {string} the name of the current map or nothing if not on map page
        */
-      $scope.getMapPage = function () {
+      $scope.getMapIdentifier = function () {
         var currentPath = $location.path();
-        if (angular.equals(currentPath, '/websocket-map')) {
-          return 'websocket';
-        }
-        else if (angular.equals(currentPath, '/sos-map')) {
-          return 'sos';
+        if(serviceURLs.hasOwnProperty(currentPath)){
+          return serviceURLs[currentPath];
         }
       };
 
@@ -51,13 +55,9 @@ angular.module('angularol3jsuiApp')
        * @returns {*} the current service if on map page otherwise nothing will be returned
        */
       $scope.getCurrentService = function () {
-        switch ($scope.getMapPage()) {
-          case 'websocket':
-            return WebsocketGeoJSONService;
-          case 'sos':
-            return SOSJSONService;
-          default:
-            return;
+        var mapId = $scope.getMapIdentifier();
+        if (services[mapId]) {
+          return services[mapId].service;
         }
       };
 
@@ -152,7 +152,7 @@ angular.module('angularol3jsuiApp')
        * Returns the current Status String
        * @returns {*} the current state
        */
-      $scope.getCurrentStatus = function(){
+      $scope.getCurrentStatus = function () {
         var currentService = $scope.getCurrentService();
         if (currentService) {
           return currentService.getStatus();
@@ -174,6 +174,26 @@ angular.module('angularol3jsuiApp')
           return currentService.getStatus();
         }
       };
+
+      //Initialize Services Object
+      if (appConfig.mapPages) {
+        var mapPages = appConfig.mapPages;
+        var mapPagesLength = mapPages.length;
+        for (var i = 0; i < mapPagesLength; i++) {
+          var mapPageConfig = mapPages[i];
+          var featureService = $injector.get(mapPageConfig.dataService);
+          services[mapPageConfig.id] = {
+            url: mapPageConfig.url,
+            service: featureService
+          };
+          serviceURLs[mapPageConfig.url] = mapPageConfig.id;
+          $scope.mapPages[i] = {
+            url: mapPageConfig.url,
+            id: mapPageConfig.id,
+            displayName: mapPageConfig.displayName
+          };
+        }
+      }
 
       /**
        * Do update labels and status on location change
@@ -203,4 +223,5 @@ angular.module('angularol3jsuiApp')
         .subscribeMessageCount(function (messageCount) {
           $scope.updateMessageCount($scope.getMessageCount(messageCount, SOSJSONService));
         });
-    }]);
+    }])
+;

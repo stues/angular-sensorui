@@ -57,13 +57,16 @@ angular.module('angularol3jsuiApp')
        * Toggles between Filtering Area and no filter
        */
       $scope.setFilterArea = function (enabled) {
-        if (!initialized && enabled) {
-          // Add Filter Area Layer to Map
-          olData.getMap().then(function (map) {
-            map.addLayer(filterAreaLayer);
-            initialized = true;
-            enableFilterArea(enabled);
-          });
+        if (!initialized) {
+          //Initialize Filter Area only if enabled
+          if(enabled){
+            // Add Filter Area Layer to Map
+            olData.getMap().then(function (map) {
+              map.addLayer(filterAreaLayer);
+              initialized = true;
+              enableFilterArea(enabled);
+            });
+          }
         }
         else {
           enableFilterArea(enabled);
@@ -90,6 +93,6 @@ angular.module('angularol3jsuiApp')
             filterAreaSource.removeFeature(featureToRemove);
           }
         }
-        $scope.$parent.getService().setFilterArea(area);
+        $scope.$parent.getDataService().setFilterArea(area);
       }
     }]);

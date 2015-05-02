@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc service
- * @name FeatureStyleService
+ * @name AircraftStyleService
  * @description
- * # FeatureStyleService
- * Provides some methods to style Features on the map
+ * # AircraftStyleService
+ * Implements getStyle and updateStyle to style a given feature as aircraft
  */
-angular.module('angularol3jsuiApp').service('FeatureStyleService', function () {
+angular.module('angularol3jsuiApp').service('AircraftStyleService', function () {
 
   var textFill = new ol.style.Fill({
     color: '#800'
