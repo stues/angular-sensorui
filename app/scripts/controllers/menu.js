@@ -15,9 +15,7 @@ angular.module('angularol3jsuiApp')
     '$location',
     '$injector',
     'appConfig',
-    'WebsocketGeoJSONService',
-    'SOSJSONService',
-    function ($scope, $location, $injector, appConfig, WebsocketGeoJSONService, SOSJSONService) {
+    function ($scope, $location, $injector, appConfig) {
 
       var serviceURLs = {};
       var services = {};
@@ -46,7 +44,7 @@ angular.module('angularol3jsuiApp')
        */
       $scope.getMapIdentifier = function () {
         var currentPath = $location.path();
-        if(serviceURLs.hasOwnProperty(currentPath)){
+        if (serviceURLs.hasOwnProperty(currentPath)) {
           return serviceURLs[currentPath];
         }
       };
@@ -175,23 +173,41 @@ angular.module('angularol3jsuiApp')
         }
       };
 
-      //Initialize Services Object
+      /**
+       * Registers a status and a message count listener on the given featureService
+       * @param featureService the feature service
+       */
+      function registerServiceListener(featureService) {
+        featureService.subscribeStatus(function (status) {
+          $scope.updateStatus($scope.getStatus(status, featureService), featureService);
+        });
+
+        featureService
+          .subscribeMessageCount(function (messageCount) {
+            $scope.updateMessageCount($scope.getMessageCount(messageCount, featureService));
+          });
+      }
+
+      //Initialize Service-Objects
       if (appConfig.mapPages) {
         var mapPages = appConfig.mapPages;
         var mapPagesLength = mapPages.length;
         for (var i = 0; i < mapPagesLength; i++) {
           var mapPageConfig = mapPages[i];
           var featureService = $injector.get(mapPageConfig.dataService);
-          services[mapPageConfig.id] = {
-            url: mapPageConfig.url,
-            service: featureService
-          };
-          serviceURLs[mapPageConfig.url] = mapPageConfig.id;
-          $scope.mapPages[i] = {
-            url: mapPageConfig.url,
-            id: mapPageConfig.id,
-            displayName: mapPageConfig.displayName
-          };
+          if (featureService) {
+            services[mapPageConfig.id] = {
+              url: mapPageConfig.url,
+              service: featureService
+            };
+            serviceURLs[mapPageConfig.url] = mapPageConfig.id;
+            $scope.mapPages[i] = {
+              url: mapPageConfig.url,
+              id: mapPageConfig.id,
+              displayName: mapPageConfig.displayName
+            };
+            registerServiceListener(featureService);
+          }
         }
       }
 
@@ -205,23 +221,5 @@ angular.module('angularol3jsuiApp')
         $scope.onMapPage = $scope.isOnMapPage();
         $scope.showCount = $scope.getCurrentMessageCount() > 0 && $scope.isOnMapPage();
       });
-
-      WebsocketGeoJSONService.subscribeStatus(function (status) {
-        $scope.updateStatus($scope.getStatus(status, WebsocketGeoJSONService), WebsocketGeoJSONService);
-      });
-
-      SOSJSONService.subscribeStatus(function (status) {
-        $scope.updateStatus($scope.getStatus(status, SOSJSONService), SOSJSONService);
-      });
-
-      WebsocketGeoJSONService
-        .subscribeMessageCount(function (messageCount) {
-          $scope.updateMessageCount($scope.getMessageCount(messageCount, WebsocketGeoJSONService));
-        });
-
-      SOSJSONService
-        .subscribeMessageCount(function (messageCount) {
-          $scope.updateMessageCount($scope.getMessageCount(messageCount, SOSJSONService));
-        });
     }])
 ;
