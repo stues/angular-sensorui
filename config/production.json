@@ -25,8 +25,8 @@
     "jsonURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/json",
     "poxURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/pox",
     "updateInterval": 10,
-    "procedure": "http://stue.ch/sensorobservation/procedure/flighttracking",
-    "offering": "http://stue.ch/sensorobservation/offering/ads-b",
+    "procedure": "http://stue.ch/sensorobservation/procedure/sbs-1",
+    "offering": "http://stue.ch/sensorobservation/offering/flighttracking",
     "properties": {
       "http://stue.ch/sensorobservation/observableProperty/callsign": {
         "type": "string",
