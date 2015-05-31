@@ -42,6 +42,8 @@ angular.module('angularol3jsuiApp')
 
     var timeDeltaController;
 
+    var receivedDataController;
+
     /**
      * Initializes the map
      * adds the featureLayer to the map
@@ -63,6 +65,17 @@ angular.module('angularol3jsuiApp')
         timeDeltaController = $scope.$new();
         timeDeltaController.deltaName = implementationConfig.timeDeltaName;
         $controller('TimeDeltaCtrl', {$scope: timeDeltaController});
+      }
+    }
+
+    /**
+     * Initializes the time delta model
+     */
+    function initReceivedDataModel() {
+      if (!receivedDataController) {
+        receivedDataController = $scope.$new();
+        receivedDataController.receivedDataName = implementationConfig.receivedDataName;
+        $controller('ReceivedDataCtrl', {$scope: receivedDataController});
       }
     }
 
@@ -183,6 +196,9 @@ angular.module('angularol3jsuiApp')
         if(timeDeltaController) {
           timeDeltaController.addDelta(object.properties.messageGenerated, object.properties.messageReceived);
         }
+        if(receivedDataController) {
+          receivedDataController.addData(object);
+        }
       }
     };
 
@@ -222,6 +238,7 @@ angular.module('angularol3jsuiApp')
     dataService.subscribeEnableState(function (enabled) {
       if (enabled) {
         initTimeDeltaModel();
+        initReceivedDataModel();
         initFeatureLayer();
         $scope.startCleanupInterval();
       }

@@ -93,8 +93,8 @@ angular.module('angularol3jsuiApp')
           '  xmlns:fes="http://www.opengis.net/fes/2.0"' +
           '  xmlns:gml="http://www.opengis.net/gml/3.2"' +
           '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd">' +
-          '	<sos:procedure>' + sosConfig.procedure + '</sos:procedure>' +
-          '	<sos:offering>' + sosConfig.offering + '</sos:offering>' +
+          (sosConfig.procedure ? '	<sos:procedure>' + sosConfig.procedure + '</sos:procedure>' : '') +
+          (sosConfig.offering ? '	<sos:offering>' + sosConfig.offering + '</sos:offering>' : '') +
           '	<sos:temporalFilter>' +
           '		<fes:During>' +
           '		<fes:ValueReference>phenomenonTime</fes:ValueReference>' +

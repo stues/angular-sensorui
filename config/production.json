@@ -25,7 +25,7 @@
     "jsonURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/json",
     "poxURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/pox",
     "updateInterval": 10,
-    "procedure": "http://stue.ch/sensorobservation/procedure/sbs-1",
+    "procedure": "",
     "offering": "http://stue.ch/sensorobservation/offering/flighttracking",
     "properties": {
       "http://stue.ch/sensorobservation/observableProperty/callsign": {
@@ -82,7 +82,8 @@
         ]
       }
     },
-    "timeDeltaName": "sosDeltas"
+    "timeDeltaName": "sosDeltas",
+    "receivedDataName": "sosData"
   },
   "websocketConfig": {
     "idProperty": "hexIdent",
@@ -133,7 +134,8 @@
         }
       }
     },
-    "timeDeltaName": "websocketDeltas"
+    "timeDeltaName": "websocketDeltas",
+    "receivedDataName": "websocketData"
   },
   "deltaConfig": {
     "persistInterval": 60000
@@ -197,6 +199,9 @@
     ]
   },
   "deltaConfig": {
+    "persistInterval": 60000
+  },
+  "receivedDataConfig": {
     "persistInterval": 60000
   }
 }

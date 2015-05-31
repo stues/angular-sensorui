@@ -33,6 +33,10 @@ angular
         templateUrl: 'views/delta-table.html',
         controller: 'TimeDeltaCtrl'
       })
+      .when('/data-table', {
+        templateUrl: 'views/data-table.html',
+        controller: 'ReceivedDataCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
