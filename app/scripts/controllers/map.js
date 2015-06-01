@@ -61,9 +61,9 @@ angular.module('angularol3jsuiApp')
      * Initializes the time delta model
      */
     function initTimeDeltaModel() {
-      if (!timeDeltaController) {
+      if (!timeDeltaController && implementationConfig.enableTimeDeltaLogger) {
         timeDeltaController = $scope.$new();
-        timeDeltaController.deltaName = implementationConfig.timeDeltaName;
+        timeDeltaController.deltaName = implementationConfig.timeDeltaLoggerName;
         $controller('TimeDeltaCtrl', {$scope: timeDeltaController});
       }
     }
@@ -72,7 +72,7 @@ angular.module('angularol3jsuiApp')
      * Initializes the time delta model
      */
     function initReceivedDataModel() {
-      if (!receivedDataController) {
+      if (!receivedDataController && implementationConfig.enableReceivedDataLogger) {
         receivedDataController = $scope.$new();
         receivedDataController.receivedDataName = implementationConfig.receivedDataName;
         $controller('ReceivedDataCtrl', {$scope: receivedDataController});

@@ -148,9 +148,10 @@ angular.module('angularol3jsuiApp')
       }
       else {
         fromDate = new Date(new Date() - sosConfig.updateInterval);
+        latestToDate = fromDate;
       }
       var toDate = new Date();
-      latestToDate = toDate;
+
       loadNewEntries(fromDate, toDate);
     }
 
@@ -201,11 +202,19 @@ angular.module('angularol3jsuiApp')
 
           if (!angular.isObject(features[observation.featureOfInterest])) {
             features[observation.featureOfInterest] = {};
+            features[observation.featureOfInterest].type = "Feature";
             features[observation.featureOfInterest].properties = {};
             features[observation.featureOfInterest].id = observation.featureOfInterest;
           }
 
-          features[observation.featureOfInterest].properties.messageGenerated = new Date(observation.resultTime);
+          var resultTime = new Date(observation.resultTime);
+
+          if(resultTime.getTime() > latestToDate.getTime()){
+            latestToDate = resultTime;
+          }
+          features[observation.featureOfInterest].properties.messageGenerated = resultTime;
+
+
           features[observation.featureOfInterest].properties.messageReceived = new Date();
 
           var propertyType = sosConfig.properties[observation.observableProperty].type;
