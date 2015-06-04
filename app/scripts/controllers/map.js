@@ -74,7 +74,7 @@ angular.module('angularol3jsuiApp')
     function initReceivedDataModel() {
       if (!receivedDataController && implementationConfig.enableReceivedDataLogger) {
         receivedDataController = $scope.$new();
-        receivedDataController.receivedDataName = implementationConfig.receivedDataName;
+        receivedDataController.receivedDataName = implementationConfig.receivedDataLoggerName;
         $controller('ReceivedDataCtrl', {$scope: receivedDataController});
       }
     }
