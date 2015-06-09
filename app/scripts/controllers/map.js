@@ -84,9 +84,17 @@ angular.module('angularol3jsuiApp')
      * @param features the new values
      */
     function applyRemoteData(features) {
-      for (var featureId in features) {
-        if (features.hasOwnProperty(featureId)) {
-          $scope.addOrUpdateFeature(features[featureId]);
+      if(angular.isArray(features)){
+        var featuresSize = features.length;
+        for(var i = 0; i < featuresSize; i++){
+          $scope.addOrUpdateFeature(features[i]);
+        }
+      }
+      else {
+        for (var featureId in features) {
+          if (features.hasOwnProperty(featureId)) {
+            $scope.addOrUpdateFeature(features[featureId]);
+          }
         }
       }
     }

@@ -139,7 +139,8 @@
     "timeDeltaLoggerName": "websocketDeltas",
     "enableTimeDeltaLogger": true,
     "receivedDataLoggerName": "websocketData",
-    "enableReceivedDataLogger": true
+    "enableReceivedDataLogger": true,
+    "skipOldObjects": false
   },
   "mapConfig": {
     "mapProjection": "EPSG:3857",

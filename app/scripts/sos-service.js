@@ -189,49 +189,163 @@ angular.module('angularol3jsuiApp')
     /**
      * Converts the given response to a collection of features
      * @param response the reponse from a successfull server call
-     * @returns {{}} a "map" object with feature id to feature
+     * @returns * {{}} or an [] depends on the used algorithm which contains the converted values
      */
     function convertToFeatures(response) {
       var observations = response.data.observations;
+      if (sosConfig.skipOldObjects) {
+        return convertNewestFeaturesOnly(observations);
+      }
+      else {
+        return convertFeatures(observations);
+      }
+    }
+
+    /**
+     * Converts the given observations into features,
+     * only the newest (by messageGenerated) features of a featureOfInterest will be returned
+     * @param observations a array of observations
+     * @returns {{}} a "map" object with feature id to feature
+     */
+    function convertNewestFeaturesOnly(observations) {
       var observationsLength = observations.length;
       var features = {};
       for (var i = 0; i < observationsLength; i++) {
         var observation = observations[i];
         if (observation.observableProperty in sosConfig.properties) {
-          var result = observation.result;
 
+          var currentFeature;
           if (!angular.isObject(features[observation.featureOfInterest])) {
-            features[observation.featureOfInterest] = {};
-            features[observation.featureOfInterest].type = "Feature";
-            features[observation.featureOfInterest].properties = {};
-            features[observation.featureOfInterest].id = observation.featureOfInterest;
+            currentFeature = getFeatureObject(observation.featureOfInterest);
+            features[observation.featureOfInterest] = currentFeature;
+          }
+          else {
+            currentFeature = features[observation.featureOfInterest];
           }
 
           var resultTime = new Date(observation.resultTime);
-
-          if(resultTime.getTime() > latestToDate.getTime()){
+          if (resultTime.getTime() > latestToDate.getTime()) {
             latestToDate = resultTime;
           }
-          features[observation.featureOfInterest].properties.messageGenerated = resultTime;
 
-
-          features[observation.featureOfInterest].properties.messageReceived = new Date();
-
-          var propertyType = sosConfig.properties[observation.observableProperty].type;
-          var propertyName = sosConfig.properties[observation.observableProperty].name;
-
-          if (propertyType === 'number') {
-            features[observation.featureOfInterest].properties[propertyName] = result.value;
-          }
-          else if (propertyType === 'string') {
-            features[observation.featureOfInterest].properties[propertyName] = result;
-          }
-          else if (propertyType === 'geojson') {
-            features[observation.featureOfInterest][propertyName] = result;
+          if (!currentFeature.properties.messageGenerated || currentFeature.properties.messageGenerated <= resultTime) {
+            currentFeature.properties.messageGenerated = resultTime;
+            updateFeature(currentFeature, observation);
           }
         }
       }
       return features;
+    }
+
+    /**
+     * Returns the feature for the given observation
+     * @param features the features map
+     * @param observation the observation
+     * @returns {*} the feature for the observation
+     */
+    function getFeatureForObservation(features, observation) {
+      var currentFeature;
+      var resultTime = observation.resultTime;
+      if (!angular.isObject(features[observation.featureOfInterest])) {
+        currentFeature = getFeatureObject(observation.featureOfInterest);
+        currentFeature.properties.messageGenerated = new Date(resultTime);
+
+        var featuresOfFot = {};
+        featuresOfFot[resultTime] = currentFeature;
+        features[observation.featureOfInterest] = featuresOfFot;
+      }
+      else {
+        var featuresOfFot = features[observation.featureOfInterest];
+        if (!angular.isObject(featuresOfFot[resultTime])) {
+          currentFeature = getFeatureObject(observation.featureOfInterest);
+          currentFeature.properties.messageGenerated = new Date(resultTime);
+
+          featuresOfFot[observation.resultTime] = currentFeature;
+        }
+        else {
+          currentFeature = featuresOfFot[resultTime];
+        }
+      }
+      return currentFeature;
+    }
+
+    /**
+     * Converts the given observations into features,
+     * all features are created for the given observation. The resultTime property and the featureOfInterest
+     * is used to identify values for the same feature instance
+     * @param observations a array of observations
+     * @returns [] a array with the generated features sorted by messageGenerated
+     */
+    function convertFeatures(observations) {
+      var observationsLength = observations.length;
+      var features = {};
+      for (var i = 0; i < observationsLength; i++) {
+        var observation = observations[i];
+        if (observation.observableProperty in sosConfig.properties) {
+          var currentFeature = getFeatureForObservation(features, observation);
+          updateFeature(currentFeature, observation);
+        }
+      }
+
+      var featuresArray = [];
+      for (var key in features) {
+        if (features.hasOwnProperty(key)) {
+          var featuresOfFot = features[key];
+          for (var featuresOfFotKeys in featuresOfFot) {
+            if (featuresOfFot.hasOwnProperty(featuresOfFotKeys)) {
+              featuresArray.push(featuresOfFot[featuresOfFotKeys]);
+            }
+          }
+        }
+      }
+
+      featuresArray.sort(function(feature1,feature2){
+        return feature1.properties.messageGenerated > feature2.properties.messageGenerated;
+      });
+
+      if(featuresArray.length > 0){
+        var latestFeature = featuresArray[featuresArray.length -1];
+        latestToDate = latestFeature.properties.messageGenerated;
+      }
+
+      return featuresArray;
+    }
+
+    /**
+     * Does update the property value or geometry of the given feature according the observation
+     * @param feature the feature to update
+     * @param observation the observation
+     */
+    function updateFeature(feature, observation) {
+      var result = observation.result;
+      var propertyType = sosConfig.properties[observation.observableProperty].type;
+      var propertyName = sosConfig.properties[observation.observableProperty].name;
+
+      if (propertyType === 'number') {
+        feature.properties[propertyName] = result.value;
+      }
+      else if (propertyType === 'string') {
+        feature.properties[propertyName] = result;
+      }
+      else if (propertyType === 'geojson') {
+        feature[propertyName] = result;
+      }
+    }
+
+    /**
+     * Returns a bare feature object for the given identifier
+     * it contains the id of the object and the messageReceived date as current date
+     * @param identifier identifier the id of the feature
+     * @returns {{type: string, properties: {messageReceived: Date}}} a bare feature object
+     */
+    function getFeatureObject(identifier) {
+      return {
+        type: "Feature",
+        properties: {
+          messageReceived: new Date()
+        },
+        id: identifier
+      }
     }
 
     /**
@@ -260,4 +374,6 @@ angular.module('angularol3jsuiApp')
     }
 
     return service;
-  });
+  }
+)
+;

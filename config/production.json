@@ -85,7 +85,8 @@
     "timeDeltaLoggerName": "sosDeltas",
     "enableTimeDeltaLogger": false,
     "receivedDataLoggerName": "sosData",
-    "enableReceivedDataLogger": false
+    "enableReceivedDataLogger": false,
+    "skipOldObjects": true
   },
   "websocketConfig": {
     "idProperty": "hexIdent",
