@@ -71,7 +71,7 @@ angular.module('angularol3jsuiApp')
      * @returns {boolean} true if active
      */
     service.isConnected = function () {
-      return angular.isObject(timeout);
+      return angular.isDefined(timeout);
     };
 
     /**
