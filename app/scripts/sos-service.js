@@ -16,7 +16,7 @@ angular.module('angularol3jsuiApp')
   function ($http, $q, $timeout, sosConfig, BaseService) {
     var service = new BaseService();
 
-    var timeout = null;
+    var timeout = undefined;
 
     var latestToDate = null;
 
