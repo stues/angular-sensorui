@@ -49,7 +49,9 @@ angular.module('angularol3jsuiApp')
     service.disconnect = function (message) {
 
       if (service.isConnected()) {
-        $timeout.cancel(timeout);
+        if(sosConfig.updateInterval > 0){
+          $timeout.cancel(timeout);
+        }
         service.resetMessageCount();
         timeout = null;
       }
