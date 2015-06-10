@@ -53,7 +53,7 @@ angular.module('angularol3jsuiApp')
           $timeout.cancel(timeout);
         }
         service.resetMessageCount();
-        timeout = null;
+        timeout = undefined;
       }
 
       service.setEnableState(false);
