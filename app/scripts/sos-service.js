@@ -49,7 +49,7 @@ angular.module('angularol3jsuiApp')
     service.disconnect = function (message) {
 
       if (service.isConnected()) {
-        if(sosConfig.updateInterval > 0){
+        if (sosConfig.updateInterval > 0) {
           $timeout.cancel(timeout);
         }
         service.resetMessageCount();
@@ -191,10 +191,10 @@ angular.module('angularol3jsuiApp')
      * @returns {*}
      */
     function handleSuccess(response) {
-      var geoFeatures = convertToFeatures(response);
-      service.fireMessages(geoFeatures);
-
       if (service.isConnected()) {
+        var geoFeatures = convertToFeatures(response);
+        service.fireMessages(geoFeatures);
+
         if (sosConfig.updateInterval > 0) {
           timeoutFunction();
         }
