@@ -29,7 +29,13 @@ angular.module('angularol3jsuiApp')
       }
 
       // Kick off the timeout
-      timeoutFunction();
+      if (sosConfig.updateInterval > 0) {
+        timeoutFunction();
+      }
+      else {
+        sosConfig.updateInterval = true;
+        loadRemoteData();
+      }
 
       service.setEnableState(true);
 
@@ -63,7 +69,7 @@ angular.module('angularol3jsuiApp')
      * @returns {boolean} true if active
      */
     service.isConnected = function () {
-      return (angular.isObject(timeout));
+      return (sosConfig.updateInterval);
     };
 
     /**
@@ -147,7 +153,12 @@ angular.module('angularol3jsuiApp')
         fromDate = latestToDate;
       }
       else {
-        fromDate = new Date(new Date() - sosConfig.updateInterval);
+        if (sosConfig.updateInterval > 0) {
+          fromDate = new Date(new Date() - sosConfig.updateInterval);
+        }
+        else {
+          fromDate = new Date(new Date() - 1);
+        }
         latestToDate = fromDate;
       }
       var toDate = new Date();
@@ -181,8 +192,13 @@ angular.module('angularol3jsuiApp')
       var geoFeatures = convertToFeatures(response);
       service.fireMessages(geoFeatures);
 
-      if (angular.isObject(timeout)) {
-        timeoutFunction();
+      if (service.isConnected()) {
+        if (sosConfig.updateInterval > 0) {
+          timeoutFunction();
+        }
+        else {
+          loadRemoteData();
+        }
       }
     }
 
@@ -299,12 +315,12 @@ angular.module('angularol3jsuiApp')
         }
       }
 
-      featuresArray.sort(function(feature1,feature2){
+      featuresArray.sort(function (feature1, feature2) {
         return feature1.properties.messageGenerated > feature2.properties.messageGenerated;
       });
 
-      if(featuresArray.length > 0){
-        var latestFeature = featuresArray[featuresArray.length -1];
+      if (featuresArray.length > 0) {
+        var latestFeature = featuresArray[featuresArray.length - 1];
         latestToDate = latestFeature.properties.messageGenerated;
       }
 
