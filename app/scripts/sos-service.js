@@ -33,7 +33,7 @@ angular.module('angularol3jsuiApp')
         timeoutFunction();
       }
       else {
-        sosConfig.updateInterval = true;
+        timeout = true;
         loadRemoteData();
       }
 
