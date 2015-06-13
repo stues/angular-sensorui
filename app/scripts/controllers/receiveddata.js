@@ -85,7 +85,6 @@ angular.module('angularol3jsuiApp')
         var dataCopy = $.extend(true, {}, data);
         dataCopy.properties.messageGenerated = dataCopy.properties.messageGenerated.getTime();
         dataCopy.properties.messageReceived = dataCopy.properties.messageReceived.getTime();
-        delete dataCopy.id;
         $scope.dataDeltas.push(dataCopy);
       };
 
