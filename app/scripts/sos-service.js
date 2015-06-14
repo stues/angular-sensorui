@@ -318,7 +318,11 @@ angular.module('angularol3jsuiApp')
       }
 
       featuresArray.sort(function (feature1, feature2) {
-        return feature1.properties.messageGenerated > feature2.properties.messageGenerated;
+        var date1 = feature1.properties.messageGenerated;
+        var date2 = feature2.properties.messageGenerated;
+        if (date1 > date2) return 1;
+        if (date1 < date2) return -1;
+        return 0;
       });
 
       if (featuresArray.length > 0) {
