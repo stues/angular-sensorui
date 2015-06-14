@@ -30,7 +30,7 @@ angular.module('angularol3jsuiApp')
         }
         else {
           $scope.savedDataObjects = [];
-          localStorage.setItem($scope.receivedDataName, JSON.stringify($scope.savedDataObjects));
+          localStorage.setItem($scope.receivedDataName, JSON.stringify($scope.savedDataObjects, null, 4));
         }
       }
 
@@ -55,7 +55,7 @@ angular.module('angularol3jsuiApp')
                   $scope.$apply();
                 }
 
-                localStorage.setItem($scope.receivedDataName, JSON.stringify($scope.savedDataObjects));
+                localStorage.setItem($scope.receivedDataName, JSON.stringify($scope.savedDataObjects, null, 4));
 
               } else {
                 loadVariablesFromStore();
@@ -74,7 +74,7 @@ angular.module('angularol3jsuiApp')
        */
       $scope.clearData = function () {
         $scope.savedDataObjects = [];
-        localStorage.setItem($scope.receivedDataName, JSON.stringify($scope.savedDataObjects));
+        localStorage.setItem($scope.receivedDataName, JSON.stringify($scope.savedDataObjects, null, 4));
       };
 
       /**
