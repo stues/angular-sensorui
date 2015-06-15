@@ -107,8 +107,8 @@ angular.module('angularol3jsuiApp')
           '		<fes:During>' +
           '		<fes:ValueReference>phenomenonTime</fes:ValueReference>' +
           '			<gml:TimePeriod gml:id="t1">' +
-          '				<gml:beginPosition>' + dateFrom.toISOString() + '</gml:beginPosition>' +
-          '				<gml:endPosition>' + dateTo.toISOString() + '</gml:endPosition>' +
+          '				<gml:beginPosition>2015-06-15T15:01:59.207+0000</gml:beginPosition>' +
+          '				<gml:endPosition>2015-06-15T15:01:59.209+0000</gml:endPosition>' +
           '			</gml:TimePeriod>' +
           '		</fes:During>' +
           '	</sos:temporalFilter>' +
