@@ -161,9 +161,18 @@ angular.module('angularol3jsuiApp')
         else {
           fromDate = new Date(new Date() - 1);
         }
+        if(sosConfig.requestDelay > 0){
+          fromDate = new Date(fromDate - sosConfig.requestDelay);
+        }
         latestToDate = fromDate;
       }
-      var toDate = new Date();
+      var toDate;
+      if(sosConfig.requestDelay > 0){
+        toDate = new Date(new Date() - sosConfig.requestDelay);
+      }
+      else{
+        toDate = new Date();
+      }
 
       loadNewEntries(fromDate, toDate);
     }
