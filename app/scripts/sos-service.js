@@ -270,17 +270,18 @@ angular.module('angularol3jsuiApp')
 
         var featuresOfFot = {};
         featuresOfFot[resultTime] = currentFeature;
+
         features[observation.featureOfInterest] = featuresOfFot;
       }
       else {
         var featuresOfFot = features[observation.featureOfInterest];
-        if (!angular.isObject(featuresOfFot[resultTime])) {
           currentFeature = getFeatureObject(observation.featureOfInterest);
           currentFeature.properties.messageGenerated = new Date(resultTime);
-
-          featuresOfFot[observation.resultTime] = currentFeature;
+        if (!angular.isObject(featuresOfFot[resultTime])) {
+          featuresOfFot[resultTime] = currentFeature;
         }
         else {
+          $.extend(true, featuresOfFot[resultTime], currentFeature);
           currentFeature = featuresOfFot[resultTime];
         }
       }
