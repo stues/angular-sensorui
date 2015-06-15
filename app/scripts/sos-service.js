@@ -16,7 +16,7 @@ angular.module('angularol3jsuiApp')
   function ($http, $q, $timeout, sosConfig, BaseService) {
     var service = new BaseService();
 
-    var timeout = undefined;
+    var timeout;
 
     var latestToDate = null;
 
@@ -263,20 +263,21 @@ angular.module('angularol3jsuiApp')
      */
     function getFeatureForObservation(features, observation) {
       var currentFeature;
+      var featuresOfFot;
       var resultTime = observation.resultTime;
       if (!angular.isObject(features[observation.featureOfInterest])) {
         currentFeature = getFeatureObject(observation.featureOfInterest);
         currentFeature.properties.messageGenerated = new Date(resultTime);
 
-        var featuresOfFot = {};
+        featuresOfFot = {};
         featuresOfFot[resultTime] = currentFeature;
 
         features[observation.featureOfInterest] = featuresOfFot;
       }
       else {
-        var featuresOfFot = features[observation.featureOfInterest];
-          currentFeature = getFeatureObject(observation.featureOfInterest);
-          currentFeature.properties.messageGenerated = new Date(resultTime);
+        featuresOfFot = features[observation.featureOfInterest];
+        currentFeature = getFeatureObject(observation.featureOfInterest);
+        currentFeature.properties.messageGenerated = new Date(resultTime);
         if (!angular.isObject(featuresOfFot[resultTime])) {
           featuresOfFot[resultTime] = currentFeature;
         }
@@ -321,8 +322,12 @@ angular.module('angularol3jsuiApp')
       featuresArray.sort(function (feature1, feature2) {
         var date1 = feature1.properties.messageGenerated;
         var date2 = feature2.properties.messageGenerated;
-        if (date1 > date2) return 1;
-        if (date1 < date2) return -1;
+        if (date1 > date2) {
+          return 1;
+        }
+        if (date1 < date2) {
+          return -1;
+        }
         return 0;
       });
 
@@ -363,12 +368,12 @@ angular.module('angularol3jsuiApp')
      */
     function getFeatureObject(identifier) {
       return {
-        type: "Feature",
+        type: 'Feature',
         properties: {
           messageReceived: new Date()
         },
         id: identifier
-      }
+      };
     }
 
     /**
