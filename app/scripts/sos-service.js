@@ -18,6 +18,7 @@ angular.module('angularol3jsuiApp')
 
     var timeout;
 
+    var previousToDate = null;
     var latestToDate = null;
 
     /**
@@ -150,31 +151,84 @@ angular.module('angularol3jsuiApp')
      * Performs the loading of new data
      */
     function loadRemoteData() {
+      var fromDate = getRangeBegin();
+      var toDate = getRangeEnd();
+      loadNewEntries(fromDate, toDate);
+    }
+
+    /**
+     * Returns the current range begin value.
+     * @returns {*} the range begin value date
+     */
+    function getRangeBegin() {
       var fromDate;
       if (angular.isObject(latestToDate)) {
-        fromDate = latestToDate;
-      }
-      else {
-        if (sosConfig.updateInterval > 0) {
-          fromDate = new Date(new Date() - sosConfig.updateInterval);
+        if (sosConfig.extendTimePeriod) {
+          fromDate = getExtendedRangeBegin();
         }
         else {
-          fromDate = new Date(new Date() - 1);
+          fromDate = latestToDate;
         }
-        if(sosConfig.requestDelay > 0){
-          fromDate = new Date(fromDate - sosConfig.requestDelay);
-        }
-        latestToDate = fromDate;
       }
+      else {
+        fromDate = getInitialRangeBegin();
+      }
+      return fromDate;
+    }
+
+    /**
+     * Returns the current range begin. The begin date will be the latestToDate minus 1ms.
+     * @returns {*} the extended range begin date
+     */
+    function getExtendedRangeBegin() {
+      var fromDate;
+      if (angular.isObject(previousToDate)) {
+        if (latestToDate.getTime() !== previousToDate.getTime()) {
+          fromDate = new Date(latestToDate - 1);
+        }
+      }
+      if (!fromDate) {
+        fromDate = latestToDate;
+      }
+
+      previousToDate = latestToDate;
+
+      return fromDate;
+    }
+
+    /**
+     * Returns the initial range begin value.
+     * @returns {*} the initial range begin date
+     */
+    function getInitialRangeBegin() {
+      var fromDate;
+      if (sosConfig.updateInterval > 0) {
+        fromDate = new Date(new Date() - sosConfig.updateInterval);
+      }
+      else {
+        fromDate = new Date(new Date() - 1);
+      }
+      if (sosConfig.requestDelay > 0) {
+        fromDate = new Date(fromDate - sosConfig.requestDelay);
+      }
+      latestToDate = fromDate;
+      return fromDate;
+    }
+
+    /**
+     * Returns the current range end value.
+     * @returns {*} the range end value date
+     */
+    function getRangeEnd() {
       var toDate;
-      if(sosConfig.requestDelay > 0){
+      if (sosConfig.requestDelay > 0) {
         toDate = new Date(new Date() - sosConfig.requestDelay);
       }
-      else{
+      else {
         toDate = new Date();
       }
 
-      loadNewEntries(fromDate, toDate);
+      return toDate;
     }
 
     /**
