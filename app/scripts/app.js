@@ -25,6 +25,10 @@ angular
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
+      .when('/#', {
+        templateUrl: 'views/main.html',
+        controller: 'MainCtrl'
+      })
       .when('', {
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
