@@ -24,7 +24,9 @@
     "requestType": "application/xml",
     "jsonURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/json",
     "poxURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/pox",
-    "updateInterval": 500,
+    "updateInterval": 1000,
+    "requestDelay": 0,
+    "extendTimePeriod": true,
     "procedure": null,
     "offering": "http://stue.ch/sensorobservation/offering/flighttracking",
     "properties": {
@@ -204,6 +206,6 @@
     "persistInterval": 60000
   },
   "receivedDataConfig": {
-    "persistInterval": 10000
+    "persistInterval": 1000
   }
 }

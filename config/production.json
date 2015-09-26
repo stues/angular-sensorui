@@ -22,9 +22,11 @@
   },
   "sosConfig": {
     "requestType": "application/xml",
-    "jsonURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/json",
-    "poxURL": "http://192.168.2.36:8080/52n-sos-webapp/sos/pox",
-    "updateInterval": 10,
+    "jsonURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/json",
+    "poxURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/pox",
+    "updateInterval": 500,
+    "requestDelay": 20,
+    "extendTimePeriod": true,
     "procedure": null,
     "offering": "http://stue.ch/sensorobservation/offering/flighttracking",
     "properties": {
@@ -83,17 +85,16 @@
       }
     },
     "timeDeltaLoggerName": "sosDeltas",
-    "enableTimeDeltaLogger": false,
+    "enableTimeDeltaLogger": true,
     "receivedDataLoggerName": "sosData",
-    "enableReceivedDataLogger": false,
-    "skipOldObjects": true
+    "enableReceivedDataLogger": true
   },
   "websocketConfig": {
     "idProperty": "hexIdent",
     "messageGeneratedProperty": "messageGenerated",
-    "url": "ws://192.168.2.4:8443/clientTrackData",
-    "cleanupInterval": 15000,
+    "url": "ws://127.0.0.1:8443/clientTrackData",
     "featureLayerName": "Websocket Tracks",
+    "cleanupInterval": 15000,
     "dataProjection": "EPSG:4326",
     "filterArea": {
       "dataProjection": "EPSG:4326",
@@ -138,12 +139,10 @@
       }
     },
     "timeDeltaLoggerName": "websocketDeltas",
-    "enableTimeDeltaLogger": false,
+    "enableTimeDeltaLogger": true,
     "receivedDataLoggerName": "websocketData",
-    "enableReceivedDataLogger": false
-  },
-  "deltaConfig": {
-    "persistInterval": 60000
+    "enableReceivedDataLogger": true,
+    "skipOldObjects": false
   },
   "mapConfig": {
     "mapProjection": "EPSG:3857",
@@ -198,7 +197,7 @@
         "label": "Position Longitude"
       },
       {
-        "property": "messageReceived",
+        "property": "lastSeen",
         "label": "Last Seen"
       }
     ]
@@ -207,6 +206,6 @@
     "persistInterval": 60000
   },
   "receivedDataConfig": {
-    "persistInterval": 60000
+    "persistInterval": 10000
   }
 }
