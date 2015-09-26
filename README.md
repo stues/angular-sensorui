@@ -1,5 +1,5 @@
 # angular-sensorui
-AngularJS project to display Sensor data received from a SOS or through a Websocket
+AngularJS project to display Sensor data provided by a Sensor Observeration Service (SOS) or received through a Websocket
 
 ## Build process
 This project can be build with node, bower and grunt
