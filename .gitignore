@@ -2,11 +2,7 @@
 node_modules
 bower_components
 dist
-.bowerrc
 .tmp
 .sass-cache
 .idea
-.editorconfig
 .gitattributes
-.jshintrc
-.travis.yml
