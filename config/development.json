@@ -8,7 +8,7 @@
         "url": "/websocket-map",
         "config": "websocketConfig",
         "dataService": "WebsocketGeoJSONService",
-        "styleService": "AircraftStyleService"
+        "styleService": "ShipStyleService"
       },
       {
         "id": "sosMap",
@@ -90,8 +90,8 @@
     "enableReceivedDataLogger": true
   },
   "websocketConfig": {
-    "idProperty": "hexIdent",
-    "messageGeneratedProperty": "messageGenerated",
+    "idProperty": "userId",
+    "messageGeneratedProperty": "timeStamp",
     "url": "ws://127.0.0.1:8443/clientTrackData",
     "featureLayerName": "Websocket Tracks",
     "cleanupInterval": 15000,
@@ -170,23 +170,31 @@
     "displayProperties": [
       {
         "property": "id",
-        "label": "Mode S"
+        "label": "Ship ID"
       },
       {
-        "property": "callsign",
-        "label": "Call Sign"
+        "property": "speedOverGround",
+        "label": "Speed"
       },
       {
-        "property": "altitude",
-        "label": "Altitude (ft)"
-      },
-      {
-        "property": "heading",
+        "property": "courseOverGround",
         "label": "Heading"
       },
       {
-        "property": "groundSpeed",
-        "label": "Speed (kt)"
+        "property": "trueHeading",
+        "label": "True Heading"
+      },
+      {
+        "property": "specialManoeuvre",
+        "label": "Special Manoeuvre"
+      },
+      {
+        "property": "spareProperty",
+        "label": "Spare Property"
+      },
+      {
+        "property": "raimFlag",
+        "label": "Raim Flag"
       },
       {
         "property": "pointLat",
