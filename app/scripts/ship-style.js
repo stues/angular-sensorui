@@ -16,7 +16,7 @@ angular.module('angularol3jsuiApp').service('ShipStyleService', function () {
   var piToRadianFactor = (2 * Math.PI) / 360.0;
 
   var rotationPropertyName = 'trueHeading';
-  var labelPropertyName = 'userId';
+  var labelPropertyName = 'name';
 
   var imgSrc = 'images/ship.svg';
   var imgSize = 32;

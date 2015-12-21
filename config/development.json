@@ -12,11 +12,11 @@
       },
       {
         "id": "sosMap",
-        "displayName": "SOS Map",
+        "displayName": "SOS Vessel Map",
         "url": "/sos-map",
         "config": "sosConfig",
         "dataService": "SOSJSONService",
-        "styleService": "AircraftStyleService"
+        "styleService": "ShipStyleService"
       }
     ]
   },
@@ -28,31 +28,43 @@
     "requestDelay": 0,
     "extendTimePeriod": true,
     "procedure": null,
-    "offering": "http://stue.ch/sensorobservation/offering/flighttracking",
+    "offering": "http://stue.ch/sensorobservation/offering/vesseltracking",
     "properties": {
       "http://stue.ch/sensorobservation/observableProperty/callsign": {
         "type": "string",
         "name": "callsign"
       },
-      "http://stue.ch/sensorobservation/observableProperty/position": {
+      "http://stue.ch/sensorobservation/observableProperty/vessel/name": {
+        "type": "string",
+        "name": "name"
+      },
+      "http://stue.ch/sensorobservation/observableProperty/vessel/destination": {
+        "type": "string",
+        "name": "destination"
+      },
+      "http://stue.ch/sensorobservation/observableProperty/vessel/speed": {
+        "type": "number",
+        "name": "speedOverGround"
+      },
+      "http://stue.ch/sensorobservation/observableProperty/vessel/specialManoeuvre": {
+        "type": "boolean",
+        "name": "specialManoeuvre"
+      },
+      "http://stue.ch/sensorobservation/observableProperty/vessel/course": {
+        "type": "number",
+        "name": "courseOverGround"
+      },
+      "http://stue.ch/sensorobservation/observableProperty/vessel/heading": {
+        "type": "number",
+        "name": "trueHeading"
+      },
+      "http://stue.ch/sensorobservation/observableProperty/vessel/position": {
         "type": "geojson",
         "name": "geometry"
-      },
-      "http://stue.ch/sensorobservation/observableProperty/heading": {
-        "type": "number",
-        "name": "heading"
-      },
-      "http://stue.ch/sensorobservation/observableProperty/altitude": {
-        "type": "number",
-        "name": "altitude"
-      },
-      "http://stue.ch/sensorobservation/observableProperty/speed": {
-        "type": "number",
-        "name": "groundSpeed"
       }
     },
     "cleanupInterval": 15000,
-    "featureLayerName": "SOS Tracks",
+    "featureLayerName": "SOS Vessel Tracks",
     "dataProjection": "EPSG:4326",
     "filterArea": {
       "dataProjection": "EPSG:4326",
@@ -93,7 +105,7 @@
     "idProperty": "userId",
     "messageGeneratedProperty": "timeStamp",
     "url": "ws://127.0.0.1:8443/clientTrackData",
-    "featureLayerName": "Websocket Tracks",
+    "featureLayerName": "Websocket Vessel Tracks",
     "cleanupInterval": 15000,
     "dataProjection": "EPSG:4326",
     "filterArea": {
@@ -169,8 +181,12 @@
     "tableAttributesInterval": 500,
     "displayProperties": [
       {
-        "property": "id",
+        "property": "userId",
         "label": "Ship ID"
+      },
+      {
+        "property": "name",
+        "label": "Vessel Name"
       },
       {
         "property": "speedOverGround",
@@ -178,7 +194,7 @@
       },
       {
         "property": "courseOverGround",
-        "label": "Heading"
+        "label": "Course Over Ground"
       },
       {
         "property": "trueHeading",
@@ -189,12 +205,8 @@
         "label": "Special Manoeuvre"
       },
       {
-        "property": "spareProperty",
-        "label": "Spare Property"
-      },
-      {
-        "property": "raimFlag",
-        "label": "Raim Flag"
+        "property": "destination",
+        "label": "Destination"
       },
       {
         "property": "pointLat",

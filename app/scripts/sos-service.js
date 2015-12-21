@@ -415,7 +415,8 @@ angular.module('angularol3jsuiApp')
       if (propertyType === 'number') {
         feature.properties[propertyName] = result.value;
       }
-      else if (propertyType === 'string') {
+      else if (propertyType === 'string' || propertyType === 'boolean') {
+        console.log(propertyType, ' ', observation);
         feature.properties[propertyName] = result;
       }
       else if (propertyType === 'geojson') {
