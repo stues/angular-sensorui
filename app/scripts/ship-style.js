@@ -41,7 +41,6 @@ angular.module('angularol3jsuiApp').service('ShipStyleService', function () {
   }
 
   function getLabel(feature) {
-    //return '<a href="http://www.marinetraffic.com/de/ais/details/ships/' + feature.get(labelPropertyName) + '">' + feature.get(labelPropertyName) + '</a>';
     return feature.get(labelPropertyName);
   }
 

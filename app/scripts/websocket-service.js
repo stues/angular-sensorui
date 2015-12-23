@@ -9,7 +9,7 @@
  * The websocketConfig must only contain the URL of the Websocket to Connect.
  * Furthermore a message to clear the filter from this websocket can be defined in the websocketConfig
  *
- * Once this service is connected it received data will be published with the fireMessages method
+ * Once this service is connected the received data will be published with the fireMessages method
  */
 angular.module('angularol3jsuiApp')
   .factory('WebsocketGeoJSONService', function (websocketConfig, BaseService) {
@@ -91,7 +91,7 @@ angular.module('angularol3jsuiApp')
     };
 
     /**
-     * Converts the given message to a collection of features
+     * Converts the given message into a collection of features
      * @param message the message from a websocket
      * @returns {{}} a "map" object with feature id to feature
      */
