@@ -1,12 +1,12 @@
 {
-  "ENV": "production",
+  "ENV": "development",
   "appConfig": {
     "mapPages": [
       {
         "id": "websocketMap",
         "displayName": "Websocket Vessel Map",
         "url": "/websocket-map",
-        "config": "websocketVesselConfig",
+        "config": "websocketConfig",
         "dataService": "WebsocketGeoJSONService",
         "styleService": "ShipStyleService"
       },
@@ -14,13 +14,13 @@
         "id": "sosMap",
         "displayName": "SOS Vessel Map",
         "url": "/sos-map",
-        "config": "sosVesselConfig",
+        "config": "sosConfig",
         "dataService": "SOSJSONService",
         "styleService": "ShipStyleService"
       }
     ]
   },
-  "sosVesselConfig": {
+  "sosConfig": {
     "requestType": "application/xml",
     "jsonURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/json",
     "poxURL": "http://127.0.0.1:8080/52n-sos-webapp/sos/pox",
@@ -101,7 +101,7 @@
     "receivedDataLoggerName": "sosData",
     "enableReceivedDataLogger": true
   },
-  "websocketVesselConfig": {
+  "websocketConfig": {
     "idProperty": "userId",
     "messageGeneratedProperty": "timeStamp",
     "url": "ws://127.0.0.1:8443/clientTrackData",

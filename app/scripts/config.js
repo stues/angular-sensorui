@@ -2,9 +2,9 @@
 
 angular.module('config', [])
 
-.constant('ENV', 'production')
+.constant('ENV', 'development')
 
-.constant('appConfig', {mapPages:[{id:'websocketMap',displayName:'Websocket Map',url:'/websocket-map',config:'websocketConfig',dataService:'WebsocketGeoJSONService',styleService:'ShipStyleService'},{id:'sosMap',displayName:'SOS Vessel Map',url:'/sos-map',config:'sosConfig',dataService:'SOSJSONService',styleService:'ShipStyleService'}]})
+.constant('appConfig', {mapPages:[{id:'websocketMap',displayName:'Websocket Vessel Map',url:'/websocket-map',config:'websocketConfig',dataService:'WebsocketGeoJSONService',styleService:'ShipStyleService'},{id:'sosMap',displayName:'SOS Vessel Map',url:'/sos-map',config:'sosConfig',dataService:'SOSJSONService',styleService:'ShipStyleService'}]})
 
 .constant('sosConfig', {requestType:'application/xml',jsonURL:'http://127.0.0.1:8080/52n-sos-webapp/sos/json',poxURL:'http://127.0.0.1:8080/52n-sos-webapp/sos/pox',updateInterval:1000,requestDelay:0,extendTimePeriod:true,procedure:null,offering:'http://stue.ch/sensorobservation/offering/vesseltracking',properties:{'http://stue.ch/sensorobservation/observableProperty/callsign':{type:'string',name:'callsign'},'http://stue.ch/sensorobservation/observableProperty/vessel/name':{type:'string',name:'name'},'http://stue.ch/sensorobservation/observableProperty/vessel/destination':{type:'string',name:'destination'},'http://stue.ch/sensorobservation/observableProperty/vessel/speed':{type:'number',name:'speedOverGround'},'http://stue.ch/sensorobservation/observableProperty/vessel/specialManoeuvre':{type:'boolean',name:'specialManoeuvre'},'http://stue.ch/sensorobservation/observableProperty/vessel/course':{type:'number',name:'courseOverGround'},'http://stue.ch/sensorobservation/observableProperty/vessel/heading':{type:'number',name:'trueHeading'},'http://stue.ch/sensorobservation/observableProperty/vessel/position':{type:'geojson',name:'geometry'}},cleanupInterval:15000,featureLayerName:'SOS Vessel Tracks',dataProjection:'EPSG:4326',filterArea:{dataProjection:'EPSG:4326',areaFilter:{type:'Polygon',coordinates:[[[7.315876,47.667385],[7.829487,47.642409],[7.848713,47.383623],[6.630604,47.265401],[7.315876,47.667385]]]}},timeDeltaLoggerName:'sosDeltas',enableTimeDeltaLogger:true,receivedDataLoggerName:'sosData',enableReceivedDataLogger:true})
 
